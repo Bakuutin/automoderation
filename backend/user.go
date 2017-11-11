@@ -1,7 +1,3 @@
-// Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package main
 
 import (
@@ -153,10 +149,6 @@ func (user *User) readPump() {
 }
 
 // writePump pumps messages from the room to the websocket connection.
-//
-// A goroutine running writePump is started for each connection. The
-// application ensures that there is at most one writer to a connection by
-// executing all writes from this goroutine.
 func (user *User) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {

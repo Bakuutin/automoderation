@@ -1,7 +1,3 @@
-// Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package main
 
 import (
@@ -27,7 +23,7 @@ type TokenResponse struct {
 }
 
 func serveHome(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "home.html")
+	http.ServeFile(w, r, "../frontend/public/index.html")
 }
 
 func (storage *roomStorage) serveAuth(w http.ResponseWriter, r *http.Request) {
@@ -71,6 +67,7 @@ func main() {
 	r.HandleFunc("/", serveHome).Methods("GET")
 	r.HandleFunc("/auth", storage.serveAuth).Methods("POST")
 	r.HandleFunc("/ws", storage.serveWs)
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("../frontend/public")))
 
 	err := http.ListenAndServe(":8080", handlers.LoggingHandler(os.Stdout, r))
 	if err != nil {
