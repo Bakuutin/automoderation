@@ -138,10 +138,10 @@ func (user *User) readPump() {
 	for {
 		_, bytesFromUser, err := user.conn.ReadMessage()
 		if err != nil {
-			fmt.Println("Error:", err.Error())
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
+			if websocket.IsUnexpectedCloseError(err) {
 				return
 			}
+			fmt.Println("Error:", err.Error())
 		}
 
 		processMessage(user, bytesFromUser)
