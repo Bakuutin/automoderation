@@ -13,6 +13,7 @@ import {
 
 import SigninForm from './SigninForm.jsx'
 import Queues from './Queues.jsx'
+import Footer from './Footer.jsx'
 
 const RoomNameForm = (props) => (
     <SigninForm
@@ -112,10 +113,6 @@ class Room extends React.Component {
         this.socket.send(JSON.stringify({priority: priority, cancel: true}))
     }
 
-    sender(priority) {
-        return () => this.handleSend(priority)
-    }
-
     render() {
         if (!this.props.auth.roomName) {
             return <RoomNameForm onSubmit={this.props.onSetRoomName}/>
@@ -136,13 +133,7 @@ class Room extends React.Component {
                     onCancel={this.handleCancel}
                     currentUserName={this.props.auth.userName}
                 />
-                <ButtonGroup size="lg">
-                    <Button color="danger" onClick={this.sender(0)}>Meta</Button>
-                    <Button color="primary" onClick={this.sender(1)}>Clarifying</Button>
-                    <Button color="info" onClick={this.sender(2)}>Expand</Button>
-                    <Button color="primary" onClick={this.sender(3)}>Probing</Button>
-                    <Button color="danger" onClick={this.sender(4)}>Change topic</Button>
-                </ButtonGroup>
+                <Footer onSend={this.handleSend}/>
             </div>
         )
     }
