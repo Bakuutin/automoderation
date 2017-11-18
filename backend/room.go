@@ -20,8 +20,8 @@ type Room struct {
 	unregister chan *User
 }
 
-const minPriority = 1
-const maxPriority = 5
+const minPriority = 0
+const maxPriority = 4
 
 func newRoom(name string) *Room {
 	room := &Room{

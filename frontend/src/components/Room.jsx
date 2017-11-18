@@ -1,11 +1,18 @@
 import React from 'react';
 import { connect } from 'react-redux'
-import { setRoomName, setUserName, setToken, setSocketConnected, setSocketDisconnected } from '../actions'
 import PropTypes from 'prop-types';
 import Loader from 'react-loaders'
 import axios from 'axios'
+import { Button, ButtonGroup } from 'reactstrap';
+
+import {
+    setRoomName, setUserName, setToken,
+    setSocketConnected, setSocketDisconnected,
+    messageReceieved,
+} from '../actions'
 
 import SigninForm from './SigninForm.jsx'
+import Queues from './Queues.jsx'
 
 const RoomNameForm = (props) => (
     <SigninForm
@@ -44,6 +51,9 @@ const mapDispatchToProps = dispatch => {
         onSocketDisconnected: () => {
             dispatch(setSocketDisconnected())
         },
+        onMessageReceieved: (message) => {
+            dispatch(messageReceieved(message))
+        },
     }
 }
 
@@ -62,6 +72,8 @@ class Room extends React.Component {
     constructor(props) {
         super(props)
         this.socket = null
+        this.handleSend = this.handleSend.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
     }
 
     onSocketClose() {
@@ -69,15 +81,11 @@ class Room extends React.Component {
         this.props.onSocketDisconnected()
     }
 
-    onSocketData(data) {
-        console.log(data)
-    }
-
     setSocket() {
         this.socket = new WebSocket(wsUrl + '?token=' + this.props.auth.token)
         this.socket.onopen = this.props.onSocketConnected
         this.socket.onclose = this.onSocketClose
-        this.socket.onmessage = (e) => this.onSocketData(JSON.parse(e.data))
+        this.socket.onmessage = (e) => this.props.onMessageReceieved(JSON.parse(e.data))
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -92,12 +100,22 @@ class Room extends React.Component {
         }
 
         if (!this.socket) {
-            this.setSocket();
-            this.forceUpdate()
+            this.setSocket()
         }
     }
 
-    // getToken(this.props.auth.roomName, this.props.auth.userName);
+    handleSend(priority) {
+        this.socket.send(JSON.stringify({priority: priority}))
+    }
+
+    handleCancel(priority) {
+        this.socket.send(JSON.stringify({priority: priority, cancel: true}))
+    }
+
+    sender(priority) {
+        return () => this.handleSend(priority)
+    }
+
     render() {
         if (!this.props.auth.roomName) {
             return <RoomNameForm onSubmit={this.props.onSetRoomName}/>
@@ -110,12 +128,21 @@ class Room extends React.Component {
         if (!this.props.auth.token || !this.props.socket.connected) {
             return <Loader type="ball-pulse-rise"/>
         }
-
         return (
             <div>
-                <h3>{this.props.auth.roomName}</h3>
-                <h3>{this.props.auth.userName}</h3>
-                <h3>{this.props.auth.token}</h3>
+                <h3>Room {this.props.auth.roomName}</h3>
+                <Queues
+                    data={this.props.socket.queues}
+                    onCancel={this.handleCancel}
+                    currentUserName={this.props.auth.userName}
+                />
+                <ButtonGroup size="lg">
+                    <Button color="danger" onClick={this.sender(0)}>Meta</Button>
+                    <Button color="primary" onClick={this.sender(1)}>Clarifying</Button>
+                    <Button color="info" onClick={this.sender(2)}>Expand</Button>
+                    <Button color="primary" onClick={this.sender(3)}>Probing</Button>
+                    <Button color="danger" onClick={this.sender(4)}>Change topic</Button>
+                </ButtonGroup>
             </div>
         )
     }
@@ -130,7 +157,7 @@ Room.propTypes = {
 
     socket: PropTypes.shape({
         connected: PropTypes.bool,
-        messages: PropTypes.any,
+        queues: PropTypes.any,
     }),
 
     onSetUserName: PropTypes.func,
@@ -139,6 +166,8 @@ Room.propTypes = {
 
     onSocketConnected: PropTypes.func,
     onSocketDisconnected: PropTypes.func,
+
+    onMessageReceieved: PropTypes.func,
 }
 
 export default connect(state => state, mapDispatchToProps)(Room)
