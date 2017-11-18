@@ -2,29 +2,19 @@ import React from 'react';
 import {
     HashRouter as Router,
     Route,
-    Link
+    Switch,
 } from 'react-router-dom'
 
-const Room = ({ match }) => (
-  <div>
-    <h3>{match.params.room}</h3>
-  </div>
-)
-
-const Hall = ({ match }) => (
-  <div>
-    <h3>Hall</h3>
-  </div>
-)
+import Room from './Room.jsx'
 
 class Root extends React.Component {
     render() {
         return (
             <Router hashType="noslash">
-                <div>
-                    <Route exact path="/" component={Hall}/>
-                    <Route path="/:room" component={Room}/>
-                </div>
+                <Switch>
+                    <Route exact path="/" component={Room}/>
+                    {/* <Route path="/:room" component={Room}/> */}
+                </Switch>
             </Router>
         );
     }

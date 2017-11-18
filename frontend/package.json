@@ -5,7 +5,7 @@
   "dependencies": {
     "babelify": "^8.0.0",
     "bootstrap": "^4.0.0-alpha.6",
-    "bootstrap4-plus-jquery": "^4.0.0-alpha.2.4",
+    "bootswatch": "^4.0.0-beta.2",
     "browserify": "^14.5.0",
     "browserify-css": "^0.13.1",
     "eslint": "^4.11.0",
@@ -16,17 +16,20 @@
     "prop-types": "^15.6.0",
     "react": "^16.1.0",
     "react-dom": "^16.1.0",
+    "react-redux": "^5.0.6",
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.0.17",
     "react-websocket": "^1.2.0",
     "reactify": "^1.1.1",
+    "reactstrap": "^5.0.0-alpha.3",
+    "redux": "^3.7.2",
     "scssify": "^3.0.1",
     "svg-browserify": "0.0.2",
     "watchify": "^3.9.0"
   },
   "scripts": {
     "start": "npm run frontend & npm run backend",
-    "frontend": "watchify -o public/bundle.js -v -d src/index.js",
+    "frontend": "watchify -o public/bundle.js -v -d src/index.jsx",
     "backend": "cd ../backend; go run *.go"
   },
   "browserify": {
@@ -54,6 +57,7 @@
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.24.1",
-    "babel-preset-react": "^6.24.1"
+    "babel-preset-react": "^6.24.1",
+    "redux-devtools": "^3.4.0"
   }
 }
