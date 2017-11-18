@@ -2,6 +2,9 @@
 @import 'bootstrap/scss/bootstrap';
 @import 'bootswatch/dist/litera/bootswatch';
 
+$primary-color: $primary;
+@import 'loaders.css/src/animations/ball-pulse-rise.scss';
+
 
 body {
     padding-top: 40px;
@@ -20,4 +23,11 @@ body {
     input {
         margin-bottom: 10px;
     }
+}
+
+.loader > div {
+    top: 175px;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
