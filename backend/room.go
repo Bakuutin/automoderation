@@ -45,7 +45,7 @@ func newRoom(name string) *Room {
 // Queue orders users for particular message priority
 type Queue []*User
 
-func (q *Queue) isContains(user *User) bool {
+func (q *Queue) contains(user *User) bool {
 	for _, u := range *q {
 		if u == user {
 			return true
@@ -56,7 +56,7 @@ func (q *Queue) isContains(user *User) bool {
 
 func (room *Room) add(user *User, priority uint8) bool {
 	queue, ok := room.queues[priority]
-	if !ok || queue.isContains(user) {
+	if !ok || queue.contains(user) {
 		return false
 	}
 
