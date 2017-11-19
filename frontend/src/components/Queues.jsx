@@ -21,7 +21,7 @@ class Message extends React.Component {
     }
 
     render() {
-        let prefix = this.props.isOwn? '*': ''
+        let prefix = this.props.isOwn? <FontAwesome name='star'/>: '';
         return (
             <Alert color={getPriorityStyle(this.props.priority)} onClick={this.handleClick}>
                 {prefix} {this.props.userName}
