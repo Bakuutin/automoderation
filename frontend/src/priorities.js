@@ -1,4 +1,4 @@
-const priorityMap = {
+const nameMap = {
     0: 'Meta',
     1: 'Clarifying question',
     2: 'Expand',
@@ -6,4 +6,14 @@ const priorityMap = {
     4: 'Change topic',
 };
 
-export const getPriorityName = (priority) => (priorityMap[priority]);
+const styleMap = {
+    0: 'meta',
+    1: 'clarifying',
+    2: 'expand',
+    3: 'probing',
+    4: 'topic',
+};
+
+
+export const getPriorityName = (priority) => (nameMap[priority]);
+export const getPriorityStyle = (priority) => (styleMap[priority]);

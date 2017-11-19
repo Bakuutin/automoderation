@@ -3,8 +3,6 @@ import React from 'react';
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
-import './style.scss';
-
 import reducer from './reducers'
 import Root from './components/Root.jsx'
 

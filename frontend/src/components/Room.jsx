@@ -2,8 +2,9 @@ import React from 'react';
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types';
 import Loader from 'react-loaders'
+import _ from 'lodash';
 import axios from 'axios'
-import { Button, ButtonGroup } from 'reactstrap';
+import { numberOfQueues } from './../constants.js';
 
 import {
     setRoomName, setUserName, setToken,
@@ -77,6 +78,14 @@ class Room extends React.Component {
         this.handleCancel = this.handleCancel.bind(this);
     }
 
+    get askedMap() {
+        let askedMap = {}
+        for (var priority = 0; priority < numberOfQueues; priority++) {
+            askedMap[priority] = _.includes(this.props.socket.queues[priority], this.props.auth.userName)
+        }
+        return askedMap
+    }
+
     onSocketClose() {
         this.socket = null
         this.props.onSocketDisconnected()
@@ -133,7 +142,7 @@ class Room extends React.Component {
                     onCancel={this.handleCancel}
                     currentUserName={this.props.auth.userName}
                 />
-                <Footer onSend={this.handleSend}/>
+                <Footer onSend={this.handleSend} askedMap={this.askedMap}/>
             </div>
         )
     }

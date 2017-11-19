@@ -1,14 +1,22 @@
-@import 'bootswatch/dist/litera/variables';
-@import 'bootstrap/scss/bootstrap';
-@import 'bootswatch/dist/litera/bootswatch';
+@import "bootswatch/dist/litera/variables";
+$font-family-sans-serif: "Roboto, sans-serif";
+
+@import "bootstrap/scss/bootstrap";
+@import "bootswatch/dist/litera/bootswatch";
+
+$fa-font-path: "/static/fonts/font-awesome";
+@import "font-awesome/scss/font-awesome";
+
+$roboto-font-path: "/static/fonts";
+@import "roboto-fontface/css/roboto/sass/roboto-fontface-regular";
 
 $primary-color: $primary;
-@import 'loaders.css/src/animations/ball-pulse-rise.scss';
+@import "loaders.css/src/animations/ball-pulse-rise";
 
 
 body {
     padding-top: 40px;
-    padding-bottom: 40px;
+    padding-bottom: 250px;
 }
 
 .form-signin {
@@ -30,4 +38,65 @@ body {
     position: absolute;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.footer {
+    .btn-group-lg {
+        width: 100%;
+
+        button {
+            border-radius: 0;
+        }
+    }
+}
+
+.alert {
+    font-size: 20px;
+}
+
+$meta-bg: $purple;
+$clarifying-bg: $blue;
+$expand-bg: $green;
+$probing-bg: $orange;
+$topic-bg: $red;
+
+.btn-meta {
+    @include button-variant($white, $meta-bg, $meta-bg);
+}
+
+.btn-clarifying {
+    @include button-variant($white, $clarifying-bg, $clarifying-bg);
+}
+
+.btn-expand {
+    @include button-variant($white, $expand-bg, $expand-bg);
+}
+
+.btn-probing {
+    @include button-variant($white, $probing-bg, $probing-bg);
+}
+
+.btn-topic {
+    @include button-variant($white, $topic-bg, $topic-bg);
+}
+
+
+.alert-meta {
+    @include alert-variant($meta-bg, $meta-bg, $white);
+}
+
+.alert-clarifying {
+    @include alert-variant($clarifying-bg, $clarifying-bg, $white);
+}
+
+.alert-expand {
+    @include alert-variant($expand-bg, $expand-bg, $white);
+}
+
+.alert-probing {
+    @include alert-variant($probing-bg, $probing-bg, $white);
+}
+
+.alert-topic {
+    @include alert-variant($topic-bg, $topic-bg, $white);
 }

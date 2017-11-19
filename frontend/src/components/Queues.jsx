@@ -1,9 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Alert } from 'reactstrap';
-import _ from 'lodash'
+import _ from 'lodash';
+import FontAwesome from 'react-fontawesome';
 
 import { numberOfQueues } from './../constants.js';
+
+import { getPriorityName, getPriorityStyle } from './../priorities.js';
 
 class Message extends React.Component {
     constructor(props) {
@@ -18,11 +21,10 @@ class Message extends React.Component {
     }
 
     render() {
+        let prefix = this.props.isOwn? '*': ''
         return (
-            <Alert color="info" onClick={this.handleClick}>
-                <p>{this.props.userName}</p>
-                <p>Priority: {this.props.priority}</p>
-                <p>{this.props.isOwn? 'Own': 'Not own'}</p>
+            <Alert color={getPriorityStyle(this.props.priority)} onClick={this.handleClick}>
+                {prefix} {this.props.userName}
             </Alert>
         )
     }

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Button, ButtonGroup } from 'reactstrap';
 
 import { numberOfQueues } from './../constants.js';
-import { getPriorityName } from './../priorities.js';
+import { getPriorityName, getPriorityStyle } from './../priorities.js';
 
 
 class Footer extends React.Component {
@@ -14,9 +14,13 @@ class Footer extends React.Component {
     render() {
         var addMeButtons = [];
         for (var priority = 0; priority < numberOfQueues; priority++) {
+            if (this.props.askedMap[priority]) {
+                continue
+            }
+
             addMeButtons.push(
                 <Button
-                    color="info"
+                    color={getPriorityStyle(priority)}
                     onClick={this.sendHandler(priority)}
                     key={priority}
                 >
@@ -25,8 +29,8 @@ class Footer extends React.Component {
             );
         }
         return (
-            <div className="footer">
-                <ButtonGroup size="lg">{addMeButtons}</ButtonGroup>
+            <div className="footer fixed-bottom">
+                <ButtonGroup size="lg" vertical>{addMeButtons}</ButtonGroup>
             </div>
         )
     }
@@ -34,6 +38,7 @@ class Footer extends React.Component {
 
 Footer.propTypes = {
     'onSend': PropTypes.func,
+    'askedMap': PropTypes.object,
 }
 
 export default Footer
