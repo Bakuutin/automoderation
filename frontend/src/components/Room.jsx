@@ -76,6 +76,7 @@ class Room extends React.Component {
         this.socket = null
         this.handleSend = this.handleSend.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
+        this.onSocketClose = this.onSocketClose.bind(this);
     }
 
     get askedMap() {
@@ -87,14 +88,17 @@ class Room extends React.Component {
     }
 
     onSocketClose() {
-        this.socket = null
+        this.socket = null;
         this.props.onSocketDisconnected()
+
+        // TODO: Attempt to reconnect
     }
 
     setSocket() {
         this.socket = new WebSocket(wsUrl + '?token=' + this.props.auth.token)
         this.socket.onopen = this.props.onSocketConnected
         this.socket.onclose = this.onSocketClose
+        this.socket.onerror = this.onSocketClose
         this.socket.onmessage = (e) => this.props.onMessageReceieved(JSON.parse(e.data))
     }
 
