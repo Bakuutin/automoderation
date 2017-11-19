@@ -1,14 +1,14 @@
+$roboto-font-path: "/static/fonts";
+@import "roboto-fontface/css/roboto/sass/roboto-fontface-regular";
+
 @import "bootswatch/dist/litera/variables";
-$font-family-sans-serif: "Roboto, sans-serif";
+$font-family-sans-serif: 'Roboto', sans-serif;
 
 @import "bootstrap/scss/bootstrap";
 @import "bootswatch/dist/litera/bootswatch";
 
 $fa-font-path: "/static/fonts/font-awesome";
 @import "font-awesome/scss/font-awesome";
-
-$roboto-font-path: "/static/fonts";
-@import "roboto-fontface/css/roboto/sass/roboto-fontface-regular";
 
 $primary-color: $primary;
 @import "loaders.css/src/animations/ball-pulse-rise";

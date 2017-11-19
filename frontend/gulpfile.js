@@ -1,24 +1,29 @@
-// var browserify = require('browserify');
-var gulp = require('gulp');
-// var source = require('vinyl-source-stream');
-// var buffer = require('vinyl-buffer');
-var gutil       = require('gulp-util');
-var uglify      = require('gulp-uglify');
-var sourcemaps  = require('gulp-sourcemaps');
-var babel       = require('gulp-babel');
-var concat      = require('gulp-concat');
-var sass        = require('gulp-sass');
+var browserify  = require('browserify'),
+    gulp        = require('gulp'),
+    gutil       = require('gulp-util'),
+    uglify      = require('gulp-uglify'),
+    sourcemaps  = require('gulp-sourcemaps'),
+    babelify    = require('babelify'),
+    concat      = require('gulp-concat'),
+    sass        = require('gulp-sass'),
+    source      = require('vinyl-source-stream'),
+    buffer      = require('vinyl-buffer');
 
 gulp.task('scripts', function () {
-    gulp.src('./src/index.jsx')
-        .pipe(sourcemaps.init())
-        .pipe(babel({
-            presets: [
-                'stage-1',
-                'es2015',
-                'react'
-                ]
-            }))
+    var bundler = browserify('./src/index.jsx', {debug: true})
+        .transform(babelify, {
+        presets: [
+            'stage-1',
+            'es2015',
+            'react',
+        ],
+        sourceMaps: true,
+    });
+
+    bundler.bundle()
+        .pipe(source('./src/index.jsx'))
+        .pipe(buffer())
+        .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(uglify())
         .pipe(concat('bundle.js'))
         .pipe(sourcemaps.write('.'))
@@ -44,7 +49,10 @@ gulp.task('fonts', ['awesome', 'roboto'])
 
 gulp.task('styles', function() {
     gulp.src('src/style.scss')
-        .pipe(sass({includePaths: ['node_modules']}).on('error', sass.logError))
+        .pipe(
+            sass({includePaths: ['node_modules']})
+            .on('error', sass.logError))
+        .pipe(concat('style.css'))
         .pipe(gulp.dest('public/css'));
 });
 
