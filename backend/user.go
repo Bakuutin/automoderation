@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -68,6 +69,7 @@ func (user *User) connect(conn *websocket.Conn) {
 type roomStorage struct {
 	rooms map[string]*Room
 	users map[string]*User
+	mux   sync.Mutex
 }
 
 func newRoomStorage() *roomStorage {
@@ -78,6 +80,9 @@ func newRoomStorage() *roomStorage {
 }
 
 func (s *roomStorage) getOrCreateRoom(name string) *Room {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
 	room, ok := s.rooms[name]
 	if !ok {
 		room = newRoom(name)

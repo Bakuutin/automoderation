@@ -38,6 +38,9 @@ func (storage *roomStorage) serveAuth(w http.ResponseWriter, r *http.Request) {
 	room := storage.getOrCreateRoom(authRequest.RoomName)
 	token := randstr.Hex(32)
 
+	room.mux.Lock()
+	defer room.mux.Unlock()
+
 	storage.users[token] = newUser(authRequest.UserName, room)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
