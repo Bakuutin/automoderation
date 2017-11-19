@@ -9,8 +9,8 @@ var babel       = require('gulp-babel');
 var concat      = require('gulp-concat');
 var sass        = require('gulp-sass');
 
-gulp.task('javascript', function () {
-    return gulp.src('./src/index.jsx')
+gulp.task('scripts', function () {
+    gulp.src('./src/index.jsx')
         .pipe(sourcemaps.init())
         .pipe(babel({
             presets: [
@@ -25,19 +25,22 @@ gulp.task('javascript', function () {
         .pipe(gulp.dest('public/js'));
 });
 
+gulp.task('watchScripts', ['build'], function() {
+    gulp.watch(['src/*.js', 'src/index.jsx', 'src/components/*.jsx'], ['scripts'])
+});
+
 gulp.task('awesome', function() {
-    return gulp.src('node_modules/font-awesome/fonts/*')
+    gulp.src('node_modules/font-awesome/fonts/*')
         .pipe(gulp.dest('public/fonts/font-awesome'))
 })
 
 gulp.task('roboto', function() {
-    return gulp.src(
+    gulp.src(
         'node_modules/roboto-fontface/fonts/roboto/*')
         .pipe(gulp.dest('public/fonts/roboto'))
 })
 
 gulp.task('fonts', ['awesome', 'roboto'])
-
 
 gulp.task('styles', function() {
     gulp.src('src/style.scss')
@@ -45,5 +48,10 @@ gulp.task('styles', function() {
         .pipe(gulp.dest('public/css'));
 });
 
+gulp.task('watchStyles', ['build'], function() {
+    gulp.watch('src/style.scss', ['styles'])
+});
 
-gulp.task('default', ['javascript', 'fonts', 'styles']);
+gulp.task('build', ['scripts', 'fonts', 'styles']);
+
+gulp.task('watch', ['build', 'watchScripts', 'watchStyles']);

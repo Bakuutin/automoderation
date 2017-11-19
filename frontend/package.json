@@ -44,32 +44,8 @@
   },
   "scripts": {
     "start": "npm run frontend & npm run backend",
-    "frontend": "watchify -o public/bundle.js -v -d src/index.jsx",
+    "frontend": "gulp watch",
     "backend": "cd ../backend; go run *.go"
-  },
-  "browserify": {
-    "transform": [
-      [
-        "scssify",
-        {
-          "sass": {
-            "includePaths": [
-              "node_modules"
-            ]
-          }
-        }
-      ],
-      [
-        "babelify",
-        {
-          "presets": [
-            "stage-1",
-            "react",
-            "es2015"
-          ]
-        }
-      ]
-    ]
   },
   "devDependencies": {
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
