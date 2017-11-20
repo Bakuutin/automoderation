@@ -140,7 +140,6 @@ class Room extends React.Component {
         }
         return (
             <div>
-                <h3>Room {this.props.auth.roomName}</h3>
                 <Queues
                     data={this.props.socket.queues}
                     onCancel={this.handleCancel}
