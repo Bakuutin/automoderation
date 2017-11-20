@@ -1,0 +1,18 @@
+version: '2.1'
+services:
+  frontend:
+    build:
+      dockerfile: ./docker/frontend.Dockerfile
+      context: .
+    volumes:
+      - static:/data/static/
+  backend:
+    build:
+      dockerfile: ./docker/backend.Dockerfile
+      context: .
+    volumes:
+      - static:/data/static/
+    ports:
+      - "${PORT:-8080}:8080"
+volumes:
+  static:

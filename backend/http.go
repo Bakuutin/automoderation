@@ -27,10 +27,6 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
-func serveHome(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "../frontend/public/index.html")
-}
-
 func (storage *roomStorage) serveAuth(w http.ResponseWriter, r *http.Request) {
 	var authRequest AuthRequest
 	decoder := json.NewDecoder(r.Body)
@@ -79,10 +75,10 @@ func (storage *roomStorage) serveWs(w http.ResponseWriter, r *http.Request) {
 func main() {
 	storage := newRoomStorage()
 	r := mux.NewRouter().StrictSlash(true)
-	r.HandleFunc("/", serveHome).Methods("GET")
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "/data/static/index.html") }).Methods("GET")
 	r.HandleFunc("/auth", storage.serveAuth).Methods("POST")
 	r.HandleFunc("/ws", storage.serveWs)
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("../frontend/public"))))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("/data/static"))))
 
 	err := http.ListenAndServe("0.0.0.0:8080", handlers.LoggingHandler(os.Stdout, r))
 	if err != nil {

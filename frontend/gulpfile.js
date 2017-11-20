@@ -27,7 +27,7 @@ gulp.task('scripts', function () {
         .pipe(uglify())
         .pipe(concat('bundle.js'))
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('public/js'));
+        .pipe(gulp.dest('/data/static/js'));
 });
 
 gulp.task('watchScripts', ['build'], function() {
@@ -36,13 +36,13 @@ gulp.task('watchScripts', ['build'], function() {
 
 gulp.task('awesome', function() {
     gulp.src('node_modules/font-awesome/fonts/*')
-        .pipe(gulp.dest('public/fonts/font-awesome'))
+        .pipe(gulp.dest('/data/static/fonts/font-awesome'))
 })
 
 gulp.task('roboto', function() {
     gulp.src(
         'node_modules/roboto-fontface/fonts/roboto/*')
-        .pipe(gulp.dest('public/fonts/roboto'))
+        .pipe(gulp.dest('/data/static/fonts/roboto'))
 })
 
 gulp.task('fonts', ['awesome', 'roboto'])
@@ -53,13 +53,17 @@ gulp.task('styles', function() {
             sass({includePaths: ['node_modules']})
             .on('error', sass.logError))
         .pipe(concat('style.css'))
-        .pipe(gulp.dest('public/css'));
+        .pipe(gulp.dest('/data/static/css'));
 });
 
 gulp.task('watchStyles', ['build'], function() {
     gulp.watch('src/style.scss', ['styles'])
 });
 
-gulp.task('build', ['scripts', 'fonts', 'styles']);
+gulp.task('public', function() {
+    gulp.src('public/*').pipe(gulp.dest('/data/static'))
+})
+
+gulp.task('build', ['public', 'scripts', 'fonts', 'styles']);
 
 gulp.task('watch', ['build', 'watchScripts', 'watchStyles']);
