@@ -147,6 +147,7 @@ func (user *User) readPump() {
 				return
 			}
 			fmt.Println("Error:", err.Error())
+			return
 		}
 
 		processMessage(user, bytesFromUser)
