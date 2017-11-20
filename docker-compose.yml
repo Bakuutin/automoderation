@@ -14,5 +14,6 @@ services:
       - static:/data/static/
     ports:
       - "${PORT:-8080}:8080"
+    restart: unless-stopped
 volumes:
   static:
