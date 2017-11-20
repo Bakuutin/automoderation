@@ -156,7 +156,7 @@ func (room *Room) run() {
 
 			if _, ok := room.users[user]; ok {
 				delete(room.users, user)
-				close(user.send)
+				user.conn.Close()
 			}
 
 			room.mux.Unlock()

@@ -136,7 +136,6 @@ func processMessage(user *User, bytesFromUser []byte) {
 func (user *User) readPump() {
 	defer func() {
 		user.room.unregister <- user
-		user.conn.Close()
 	}()
 	user.conn.SetReadLimit(maxMessageSize)
 	user.conn.SetReadDeadline(time.Now().Add(pongWait))
@@ -160,7 +159,6 @@ func (user *User) writePump() {
 	defer func() {
 		ticker.Stop()
 		user.room.unregister <- user
-		user.conn.Close()
 	}()
 	for {
 		select {
