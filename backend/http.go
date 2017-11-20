@@ -17,9 +17,14 @@ type AuthRequest struct {
 	UserName string `json:"name"`
 }
 
-// TokenResponse represents auth response format
+// TokenResponse represents auth response format for registered user
 type TokenResponse struct {
 	Token string `json:"token"`
+}
+
+// ErrorResponse represents auth response format for dismissed user
+type ErrorResponse struct {
+	Error string `json:"error"`
 }
 
 func serveHome(w http.ResponseWriter, r *http.Request) {
@@ -36,6 +41,12 @@ func (storage *roomStorage) serveAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	room := storage.getOrCreateRoom(authRequest.RoomName)
+	if room.reserved(authRequest.UserName) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusConflict)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "Sorry, that username is already taken"})
+	}
+
 	token := randstr.Hex(32)
 
 	room.mux.Lock()
@@ -62,6 +73,7 @@ func (storage *roomStorage) serveWs(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user.connect(conn)
+	user.room.sendCurrentState(user)
 }
 
 func main() {

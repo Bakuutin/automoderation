@@ -93,6 +93,19 @@ func (room *Room) sendCurrentState(user *User) {
 	}
 }
 
+func (room *Room) reserved(userName string) bool {
+	room.mux.Lock()
+	defer room.mux.Unlock()
+
+	for user := range room.users {
+		if user.name == userName {
+			return true
+		}
+	}
+
+	return false
+}
+
 // BroadcatedMessage represents the data broadcasted to users
 type BroadcatedMessage struct {
 	Username string `json:"user"`
@@ -106,7 +119,18 @@ func (m *BroadcatedMessage) getBytes() []byte {
 }
 
 func (room *Room) broadcast(b *BroadcatedMessage) {
-	room.send <- b.getBytes()
+	bytesToSend := b.getBytes()
+
+	for user, connected := range room.users {
+		if !connected {
+			continue
+		}
+		select {
+		case user.send <- bytesToSend:
+		default:
+			room.unregister <- user
+		}
+	}
 }
 
 func (room *Room) run() {
@@ -114,21 +138,35 @@ func (room *Room) run() {
 	for {
 		select {
 		case user := <-room.register:
-			room.users[user] = true
+			room.mux.Lock()
+			room.users[user] = false
+			room.mux.Unlock()
+
 			room.sendCurrentState(user)
 		case user := <-room.unregister:
+			room.mux.Lock()
+			prioritiesToClean := make([]uint8, 0)
+
+			for priority := range room.queues {
+				removed := room.remove(user, priority)
+				if removed {
+					prioritiesToClean = append(prioritiesToClean, priority)
+				}
+			}
+
 			if _, ok := room.users[user]; ok {
 				delete(room.users, user)
 				close(user.send)
 			}
-		case bytesToSend := <-room.send:
-			for user := range room.users {
-				select {
-				case user.send <- bytesToSend:
-				default:
-					close(user.send)
-					delete(room.users, user)
-				}
+
+			room.mux.Unlock()
+
+			for _, priority := range prioritiesToClean {
+				room.broadcast(&BroadcatedMessage{
+					Username: user.name,
+					Priority: priority,
+					Cancel:   true,
+				})
 			}
 		}
 	}

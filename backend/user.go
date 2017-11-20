@@ -58,12 +58,13 @@ func (user *User) broadcast(b *BroadcatedMessage) {
 }
 
 func (user *User) connect(conn *websocket.Conn) {
-	user.conn = conn
+	user.room.mux.Lock()
+	defer user.room.mux.Unlock()
 
+	user.conn = conn
 	go user.writePump()
 	go user.readPump()
-
-	user.room.register <- user
+	user.room.users[user] = true
 }
 
 type roomStorage struct {
