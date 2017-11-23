@@ -62,6 +62,7 @@ gulp.task('watchStyles', ['build'], function() {
 
 gulp.task('public', function() {
     gulp.src('public/*').pipe(gulp.dest('/data/static'))
+    gulp.src('public/icons/*').pipe(gulp.dest('/data/static/icons'))
 })
 
 gulp.task('build', ['public', 'scripts', 'fonts', 'styles']);
