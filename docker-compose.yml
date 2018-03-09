@@ -6,12 +6,14 @@ services:
       context: .
     volumes:
       - static:/data/static/
+      - ./frontend/src:/usr/local/app/src
   backend:
     build:
       dockerfile: ./docker/backend.Dockerfile
       context: .
     volumes:
       - static:/data/static/
+      - ./backend:/go/src/automoderation
     ports:
       - "${PORT:-8080}:8080"
     restart: unless-stopped
