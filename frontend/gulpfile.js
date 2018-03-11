@@ -9,8 +9,17 @@ var browserify  = require('browserify'),
     source      = require('vinyl-source-stream'),
     buffer      = require('vinyl-buffer');
 
+var config = {
+    production: !!gutil.env.production
+};
+
+function swallowError (error) {
+    console.log(error.toString())
+    this.emit('end')
+}
+
 gulp.task('scripts', function () {
-    var bundler = browserify('./src/index.jsx', {debug: true})
+    var bundler = browserify('./src/index.jsx')
         .transform(babelify, {
         presets: [
             'stage-1',
@@ -21,14 +30,16 @@ gulp.task('scripts', function () {
     });
 
     bundler.bundle()
-        .pipe(source('./src/index.jsx'))
+    .pipe(source('./src/index.jsx'))
         .pipe(buffer())
-        .pipe(sourcemaps.init({loadMaps: true}))
-        .pipe(uglify())
+        .pipe(config.production ? gutil.noop(): sourcemaps.init({'loadmaps': true}))
+        .pipe(config.production ? uglify() : gutil.noop())
         .pipe(concat('bundle.js'))
-        .pipe(sourcemaps.write('.'))
+        .pipe(config.production ? gutil.noop(): sourcemaps.write('.'))
+        .on('error', swallowError)
         .pipe(gulp.dest('/data/static/js'));
 });
+
 
 gulp.task('watchScripts', ['build'], function() {
     gulp.watch(['src/*.js', 'src/index.jsx', 'src/components/*.jsx'], ['scripts'])
@@ -49,10 +60,9 @@ gulp.task('fonts', ['awesome', 'roboto'])
 
 gulp.task('styles', function() {
     gulp.src('src/style.scss')
-        .pipe(
-            sass({includePaths: ['node_modules']})
-            .on('error', sass.logError))
+        .pipe(sass({includePaths: ['node_modules']}).on('error', sass.logError))
         .pipe(concat('style.css'))
+        .on('error', swallowError)
         .pipe(gulp.dest('/data/static/css'));
 });
 

@@ -8,7 +8,7 @@ import { numberOfQueues } from './../constants.js';
 
 import { getPriorityName, getPriorityStyle } from './../priorities.js';
 
-class Message extends React.Component {
+class Hand extends React.Component {
     constructor(props) {
         super(props);
         this.handleClick = this.handleClick.bind(this);
@@ -30,26 +30,26 @@ class Message extends React.Component {
     }
 }
 
-Message.propTypes = {
+Hand.propTypes = {
     'userName': PropTypes.string,
     'priority': PropTypes.number,
     'isOwn': PropTypes.bool,
 }
 
-const Queues = (props) => {
-    let messages = []
-    for (var priority = 0; priority < numberOfQueues; priority++) {
-        messages = _.concat(messages, _.map(props.data[priority], (userName) => (
-            <Message
-                userName={userName}
-                priority={priority}
-                key={[userName, priority]}
-                isOwn={userName === props.currentUserName}
-                onCancel={props.onCancel}
-            />
-        )))
-    }
-    return <div className="queues">{messages}</div>
+const Queue = (props) => {
+    let hands = []
+    // for (var priority = 0; priority < numberOfQueues; priority++) {
+    //     hands = _.concat(hands, _.map(props.data[priority], (userName) => (
+    //         <Hand
+    //             userName={userName}
+    //             priority={priority}
+    //             key={[userName, priority]}
+    //             isOwn={userName === props.currentUserName}
+    //             onCancel={props.onCancel}
+    //         />
+    //     )))
+    // }
+    return <div className="queues">{hands}</div>
 }
 
-export default Queues
+export default Queue

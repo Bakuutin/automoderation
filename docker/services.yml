@@ -1,0 +1,35 @@
+version: '2.1'
+services:
+  frontend:
+    build:
+      dockerfile: ./docker/frontend.Dockerfile
+      context: ..
+    volumes:
+      - static:/data/static/
+    restart: unless-stopped
+  frontend-prod:
+    extends: frontend
+    environment:
+      NODE_ENV: production
+    command: ["node_modules/.bin/gulp", "build", "--production"]
+  frontend-dev:
+    environment:
+      NODE_ENV: debug
+    extends: frontend
+    volumes:
+      - ../frontend/src:/usr/local/app/src
+    command: ["node_modules/.bin/gulp", "watch"]
+
+  backend:
+    build:
+      dockerfile: ./docker/backend.Dockerfile
+      context: ..
+    volumes:
+      - static:/data/static/
+  backend-prod:
+    extends: backend
+    restart: unless-stopped
+  backend-dev:
+    extends: backend
+    volumes:
+      - ../backend:/go/src/automoderation

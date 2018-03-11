@@ -1,176 +1,187 @@
 import React from 'react';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import Loader from 'react-loaders'
+import Loader from 'react-loaders';
 import _ from 'lodash';
-import axios from 'axios'
+import axios from 'axios';
 import { numberOfQueues } from './../constants.js';
+import qs from 'qs';
 
-import {
-    setRoomName, setUserName, setToken,
-    setSocketConnected, setSocketDisconnected,
-    messageReceieved,
-} from '../actions'
+import { setUserName, setToken, handReceieved, resetHands } from '../actions'
 
 import SigninForm from './SigninForm.jsx'
-import Queues from './Queues.jsx'
+import Queue from './Queue.jsx'
 import Footer from './Footer.jsx'
 
-const RoomNameForm = (props) => (
-    <SigninForm
-        title="Please,"
-        subtitle="enter the room name"
-        placeholder="Platform 9¾"
-        buttonText="Let's go"
-        onSubmit={props.onSubmit}
-    />
-)
-
-const UserNameForm = (props) => (
-    <SigninForm
-        title="Almost there,"
-        subtitle="choose a name"
-        placeholder="T-Rex 9000"
-        buttonText="Join"
-        onSubmit={props.onSubmit}
-    />
-)
+const mapStateToProps = (state, ownProps) => {
+    return {
+        token: state.auth.rooms[ownProps.name],
+        userName: state.auth.userName,
+        hands: state.hands,
+    }
+}
 
 const mapDispatchToProps = dispatch => {
     return {
         onSetUserName: (value) => {
             dispatch(setUserName(value))
         },
-        onSetRoomName: (value) => {
-            dispatch(setRoomName(value))
+        onSetToken: (roomName, token) => {
+            dispatch(setToken(roomName, token))
         },
-        onSetToken: (value) => {
-            dispatch(setToken(value))
+        onHandReceieved: (hand) => {
+            dispatch(handReceieved(hand))
         },
-        onSocketConnected: () => {
-            dispatch(setSocketConnected())
-        },
-        onSocketDisconnected: () => {
-            dispatch(setSocketDisconnected())
-        },
-        onMessageReceieved: (message) => {
-            dispatch(messageReceieved(message))
+        onResetHands: () => {
+            dispatch(resetHands())
         },
     }
 }
 
-const getToken = (roomName, userName, onSetToken) => {
-    axios.post('/auth', {
-        room: roomName,
-        name: userName,
-    }).then((response) => {
-        onSetToken(response.data.token);
-    });
-}
-
-const wsUrl = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/ws";
+const https = (window.location.protocol === 'https:');
+const wsUrl = (https ? 'wss://' : 'ws://') + window.location.host + '/ws';
 
 class Room extends React.Component {
     constructor(props) {
         super(props)
-        this.socket = null
         this.handleSend = this.handleSend.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.onSocketClose = this.onSocketClose.bind(this);
+        this.onSocketConnected = this.onSocketConnected.bind(this);
+        this.onSetUserName = this.onSetUserName.bind(this);
+        this.state = {
+            usernameIsTaken: false,
+            ws: null,
+            connected: false,
+        }
     }
 
-    get askedMap() {
-        let askedMap = {}
-        for (var priority = 0; priority < numberOfQueues; priority++) {
-            askedMap[priority] = _.includes(this.props.socket.queues[priority], this.props.auth.userName)
-        }
-        return askedMap
-    }
+    // get askedMap() {
+    //     let askedMap = {}
+    //     for (var priority = 0; priority < numberOfQueues; priority++) {
+    //         askedMap[priority] = _.includes(this.props.ws.queues[priority], this.props.userName)
+    //     }
+    //     return askedMap
+    // }
 
     onSocketClose() {
-        this.socket = null;
-        this.props.onSocketDisconnected()
+        this.state.ws = null;
+        this.state.connected = false;
+    }
 
-        // TODO: Attempt to reconnect
+    onSocketConnected() {
+        this.state.connected = true;
+        this.forceUpdate();
+    }
+
+    get client() {
+        return axios.create({
+            headers: {'Token': this.props.token || ''},
+            timeout: 2000,
+        });
+    }
+
+    dropToken() {
+        this.props.onSetToken(this.props.name, null);
+    }
+
+    getToken() {
+        this.client.post('/auth', {
+            'room': this.props.name,
+            'name': this.props.userName,
+        }).then((response) => {
+            this.props.onSetToken(this.props.name, response.data.token);
+        }).catch((error) => {
+            if (error.response && error.response.status === 409) {
+                this.state.usernameIsTaken = true;
+            } else {
+                this.dropToken();
+            }
+            this.forceUpdate();
+        });
+    }
+
+    onSetUserName(newUsername) {
+        this.state.usernameIsTaken = false;
+        this.props.onSetUserName(newUsername);
+        this.forceUpdate();
     }
 
     setSocket() {
-        this.socket = new WebSocket(wsUrl + '?token=' + this.props.auth.token)
-        this.socket.onopen = this.props.onSocketConnected
-        this.socket.onclose = this.onSocketClose
-        this.socket.onerror = this.onSocketClose
-        this.socket.onmessage = (e) => this.props.onMessageReceieved(JSON.parse(e.data))
+        this.props.onResetHands();
+        this.state.ws = new WebSocket(wsUrl + '?' + qs.stringify({'token': this.props.token}));
+        this.state.ws.onopen = this.onSocketConnected;
+        this.state.ws.onclose = this.onSocketClose;
+        this.state.ws.onerror = this.onSocketClose;
+        this.state.ws.onmessage = (e) => this.props.onMessageReceieved(JSON.parse(e.data));
+        window.ws = this.state.ws;
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (!this.props.auth.roomName || !this.props.auth.userName) {
+        if (!this.props.userName || this.state.usernameIsTaken) {
             return
         }
 
-        if (!this.props.auth.token) {
-            this.socket = null;
-            getToken(this.props.auth.roomName, this.props.auth.userName, this.props.onSetToken);
+        if (!this.props.token) {
+            this.state.ws = null;
+            this.getToken();
             return
         }
 
-        if (!this.socket) {
-            this.setSocket()
+        if (!this.state.ws) {
+            this.setSocket();
         }
     }
 
     handleSend(priority) {
-        this.socket.send(JSON.stringify({priority: priority}))
+        this.client.post('/api/hands', JSON.stringify({priority: priority}));
     }
 
-    handleCancel(priority) {
-        this.socket.send(JSON.stringify({priority: priority, cancel: true}))
+    handleCancel(hand) {
+        this.client.delete('/api/hands/' + hand.id);
     }
 
     render() {
-        if (!this.props.auth.roomName) {
-            return <RoomNameForm onSubmit={this.props.onSetRoomName}/>
+        if (!this.props.userName || this.state.usernameIsTaken) {
+            return (
+                <SigninForm
+                    title="Almost there,"
+                    subtitle="choose a name"
+                    placeholder="T-Rex 9000"
+                    buttonText="Join"
+                    initial={this.props.userName}
+                    onSubmit={this.onSetUserName}
+                    errorHand={this.state.usernameIsTaken ? "Already taken in this room, sorry": null}
+                    />
+            );
         }
 
-        if (!this.props.auth.userName) {
-            return <UserNameForm onSubmit={this.props.onSetUserName}/>
-        }
-
-        if (!this.props.auth.token || !this.props.socket.connected) {
-            return <Loader type="ball-pulse-rise"/>
+        if (!this.props.token || !this.state.connected) {
+            console.log(this.props.token, this.state.connected);
+            return <Loader type="ball-pulse-rise"/>;
         }
         return (
             <div>
-                <Queues
-                    data={this.props.socket.queues}
+                <h3>You entered {this.props.name}</h3>
+                <Queue
+                    data={this.props.hands}
                     onCancel={this.handleCancel}
-                    currentUserName={this.props.auth.userName}
+                    currentUserName={this.props.userName}
                 />
-                <Footer onSend={this.handleSend} askedMap={this.askedMap}/>
+                {/* <Footer onSend={this.handleSend} askedMap={this.askedMap}/> */}
             </div>
-        )
+        );
     }
 }
 
 Room.propTypes = {
-    auth: PropTypes.shape({
-        userName: PropTypes.string,
-        roomName: PropTypes.string,
-        token: PropTypes.string,
-    }),
-
-    socket: PropTypes.shape({
-        connected: PropTypes.bool,
-        queues: PropTypes.any,
-    }),
+    userName: PropTypes.string,
+    token: PropTypes.string,
+    name: PropTypes.string.isRequired,
 
     onSetUserName: PropTypes.func,
-    onSetRoomName: PropTypes.func,
     onSetToken: PropTypes.func,
-
-    onSocketConnected: PropTypes.func,
-    onSocketDisconnected: PropTypes.func,
-
-    onMessageReceieved: PropTypes.func,
+    onHandReceieved: PropTypes.func,
 }
 
-export default connect(state => state, mapDispatchToProps)(Room)
+export default connect(mapStateToProps, mapDispatchToProps)(Room)

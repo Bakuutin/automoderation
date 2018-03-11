@@ -28,8 +28,12 @@ body {
         margin-bottom: 10px;
     }
 
-    input {
-        margin-bottom: 10px;
+    input.rounded {
+        border-radius: 0.25rem;
+    }
+
+    button {
+        margin-top: 10px;
     }
 }
 

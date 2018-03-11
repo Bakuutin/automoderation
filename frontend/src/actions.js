@@ -1,16 +1,11 @@
 import {
-    SET_ROOM_NAME, SET_USER_NAME, SET_TOKEN,
-    SOCKET_CONNECTED, SOCKET_DISCONNECTED,
-    MESSAGE_ADDED, MESSAGE_DELETED,
+    SET_USER_NAME,
+    SET_TOKEN,
+    RESET_HANDS,
+    HAND_ADDED,
+    HAND_DELETED,
 } from './actionTypes.js'
 
-
-export const setRoomName = roomName => {
-    return {
-        type: SET_ROOM_NAME,
-        roomName
-    }
-}
 
 export const setUserName = userName => {
     return {
@@ -19,30 +14,23 @@ export const setUserName = userName => {
     }
 }
 
-export const setToken = token => {
+export const setToken = (roomName, token) => {
     return {
         type: SET_TOKEN,
+        roomName,
         token
     }
 }
 
-
-export const setSocketConnected = () => {
+export const handReceieved = (hand) => {
     return {
-        type: SOCKET_CONNECTED,
+        type: hand.cancel ? HAND_DELETED : HAND_ADDED,
+        hand
     }
 }
 
-
-export const setSocketDisconnected = () => {
+export const resetHands = () => {
     return {
-        type: SOCKET_DISCONNECTED,
-    }
-}
-
-export const messageReceieved = (message) => {
-    return {
-        type: message.cancel ? MESSAGE_DELETED : MESSAGE_ADDED,
-        message
+        type: RESET_HANDS
     }
 }
