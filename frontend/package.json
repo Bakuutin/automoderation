@@ -25,6 +25,7 @@
     "lessify": "^1.0.1",
     "loaders.css": "^0.1.2",
     "lodash": "^4.17.4",
+    "moment": "^2.21.0",
     "prop-types": "^15.6.0",
     "randomstring": "^1.1.5",
     "react": "^16.1.0",
