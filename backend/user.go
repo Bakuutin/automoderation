@@ -86,6 +86,9 @@ func (user *User) runPing() {
 	for {
 		select {
 		case <-ticker.C:
+			if user.conn == nil {
+				return
+			}
 			user.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := user.conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
 				return

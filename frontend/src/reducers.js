@@ -31,7 +31,7 @@ const hands = (state = [], action = {}) => {
     case HAND_ADDED:
       return _.sortBy(_.concat(state, action.hand), ['priority'])
     case HAND_DELETED:
-      return _.filter(state, (hand) => (hand.id === action.hand.id))
+      return _.filter(state, (hand) => (hand.id !== action.hand.id))
     case RESET_HANDS:
       return []
     default:

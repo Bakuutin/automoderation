@@ -10,7 +10,7 @@ import qs from 'qs';
 import { setUserName, setToken, handReceieved, resetHands } from '../actions'
 
 import SigninForm from './SigninForm.jsx'
-import Queue from './Queue.jsx'
+import Hand from './Hand.jsx'
 import Footer from './Footer.jsx'
 
 const mapStateToProps = (state, ownProps) => {
@@ -47,30 +47,66 @@ class Room extends React.Component {
         this.handleSend = this.handleSend.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.onSocketClose = this.onSocketClose.bind(this);
+        this.onSocketError = this.onSocketError.bind(this);
         this.onSocketConnected = this.onSocketConnected.bind(this);
         this.onSetUserName = this.onSetUserName.bind(this);
+        this.onRequestError = this.onRequestError.bind(this);
+
         this.state = {
             usernameIsTaken: false,
             ws: null,
             connected: false,
+            failedAttemptsToConnect: 0,
         }
     }
 
-    // get askedMap() {
-    //     let askedMap = {}
-    //     for (var priority = 0; priority < numberOfQueues; priority++) {
-    //         askedMap[priority] = _.includes(this.props.ws.queues[priority], this.props.userName)
-    //     }
-    //     return askedMap
-    // }
+    get hands() {
+        return _.map(this.props.hands, (handData, index) => React.createElement(
+            Hand,
+            _.merge({}, handData, {
+                'onCancel': this.handleCancel,
+                'key': handData.id,
+                'position': index,
+            }),
+            null
+        ));
+    }
 
     onSocketClose() {
         this.state.ws = null;
         this.state.connected = false;
     }
 
+    onSocketError() {
+        console.log('Socket error, trying to reconnect')
+        this.onSocketClose();
+        this.state.failedAttemptsToConnect++;
+
+        setTimeout(() => {
+            this.setSocket();
+            this.forceUpdate();
+        }, 200 * Math.pow(2, this.state.failedAttemptsToConnect));
+    }
+
     onSocketConnected() {
         this.state.connected = true;
+        this.state.failedAttemptsToConnect = 0;
+        this.forceUpdate();
+    }
+
+    onRequestError(error) {
+        if (error.response) {
+            switch (error.response.status) {
+                case 409:
+                    this.state.usernameIsTaken = true;
+                case 401:
+                    this.dropToken();
+                case 404:
+                    this.setSocket();
+            }
+        } else {
+            this.dropToken();
+        }
         this.forceUpdate();
     }
 
@@ -78,10 +114,11 @@ class Room extends React.Component {
         return axios.create({
             headers: {'Token': this.props.token || ''},
             timeout: 2000,
-        });
+        })
     }
 
     dropToken() {
+        this.closeSocket();
         this.props.onSetToken(this.props.name, null);
     }
 
@@ -91,14 +128,7 @@ class Room extends React.Component {
             'name': this.props.userName,
         }).then((response) => {
             this.props.onSetToken(this.props.name, response.data.token);
-        }).catch((error) => {
-            if (error.response && error.response.status === 409) {
-                this.state.usernameIsTaken = true;
-            } else {
-                this.dropToken();
-            }
-            this.forceUpdate();
-        });
+        }).catch(this.onRequestError);
     }
 
     onSetUserName(newUsername) {
@@ -107,14 +137,33 @@ class Room extends React.Component {
         this.forceUpdate();
     }
 
+    onHandReceieved(handData) {
+        handData['isOwn'] = handData.user === this.props.userName;
+        this.props.onHandReceieved(handData);
+    }
+
     setSocket() {
         this.props.onResetHands();
         this.state.ws = new WebSocket(wsUrl + '?' + qs.stringify({'token': this.props.token}));
         this.state.ws.onopen = this.onSocketConnected;
         this.state.ws.onclose = this.onSocketClose;
-        this.state.ws.onerror = this.onSocketClose;
-        this.state.ws.onmessage = (e) => this.props.onMessageReceieved(JSON.parse(e.data));
+        this.state.ws.onerror = this.onSocketError;
+        this.state.ws.onmessage = (e) => this.onHandReceieved(JSON.parse(e.data));
         window.ws = this.state.ws;
+    }
+
+    componentWillUnmount() {
+        this.closeSocket();
+    }
+
+    closeSocket() {
+        if (this.ws) {
+            this.ws.close();
+        }
+    }
+
+    componentDidMount() {
+        this.componentDidUpdate();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -134,11 +183,11 @@ class Room extends React.Component {
     }
 
     handleSend(priority) {
-        this.client.post('/api/hands', JSON.stringify({priority: priority}));
+        this.client.post('/api/hands/', {priority: priority}).catch(this.onRequestError);
     }
 
-    handleCancel(hand) {
-        this.client.delete('/api/hands/' + hand.id);
+    handleCancel(handId) {
+        this.client.delete(`/api/hands/${handId}`).catch(this.onRequestError);
     }
 
     render() {
@@ -157,18 +206,12 @@ class Room extends React.Component {
         }
 
         if (!this.props.token || !this.state.connected) {
-            console.log(this.props.token, this.state.connected);
             return <Loader type="ball-pulse-rise"/>;
         }
         return (
             <div>
-                <h3>You entered {this.props.name}</h3>
-                <Queue
-                    data={this.props.hands}
-                    onCancel={this.handleCancel}
-                    currentUserName={this.props.userName}
-                />
-                {/* <Footer onSend={this.handleSend} askedMap={this.askedMap}/> */}
+                <div className="queues">{this.hands}</div>
+                <Footer onSend={this.handleSend}/>
             </div>
         );
     }

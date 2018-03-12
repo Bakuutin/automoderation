@@ -163,7 +163,7 @@ func main() {
 	r.HandleFunc(`/ws`, storage.serveWs)
 
 	hands := r.PathPrefix(`/api/hands`).Subrouter()
-	hands.HandleFunc(`/`, storage.AskToken(raiseHand)).Methods("GET")
+	hands.HandleFunc(`/`, storage.AskToken(raiseHand)).Methods("POST")
 	hands.HandleFunc(`/{handID:[\-a-z0-9]{36}}`, storage.AskToken(dropHand)).Methods("DELETE")
 
 	r.PathPrefix(`/static/`).Handler(http.StripPrefix(`/static/`, http.FileServer(http.Dir(`/data/static`))))

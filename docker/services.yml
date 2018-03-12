@@ -18,6 +18,9 @@ services:
     extends: frontend
     volumes:
       - ../frontend/src:/usr/local/app/src
+      - ../frontend/gulpfile.js:/usr/local/app/gulpfile.js:ro
+      - ../frontend/package.json:/usr/local/app/package.json:ro
+
     command: ["node_modules/.bin/gulp", "watch"]
 
   backend:

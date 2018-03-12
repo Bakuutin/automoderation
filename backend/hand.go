@@ -13,7 +13,7 @@ type Hand struct {
 	Priority uint8     `json:"priority"`
 	ID       uuid.UUID `json:"id"`
 	Cancel   bool      `json:"cancel,omitempty"`
-	RaisedAt int64     `json:"raised_at"`
+	RaisedAt int64     `json:"raisedAt"`
 }
 
 // Bytes returns bytes representation of a Hand

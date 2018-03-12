@@ -7,7 +7,8 @@ var browserify  = require('browserify'),
     concat      = require('gulp-concat'),
     sass        = require('gulp-sass'),
     source      = require('vinyl-source-stream'),
-    buffer      = require('vinyl-buffer');
+    buffer      = require('vinyl-buffer'),
+    tap          = require('gulp-tap');
 
 var config = {
     production: !!gutil.env.production
@@ -19,27 +20,35 @@ function swallowError (error) {
 }
 
 gulp.task('scripts', function () {
-    var bundler = browserify('./src/index.jsx')
-        .transform(babelify, {
-        presets: [
-            'stage-1',
-            'es2015',
-            'react',
-        ],
-        sourceMaps: true,
-    });
+    browserify({
+        'entries': 'src/index.jsx',
+        'debug': !config.production,
+        'transform': [babelify.configure({
+            presets: [
+                'stage-1',
+                'es2015',
+                'react',
+            ],
+            sourceMaps: !config.production,
+        })]
+    })
+    .bundle()
+    .pipe(source('src/index.jsx'))
+    .pipe(buffer())
+    .pipe(config.production ? gutil.noop(): sourcemaps.init({loadMaps: true}))
+    .pipe(config.production ? uglify() : gutil.noop())
+    .pipe(concat('bundle.js'))
+    .pipe(config.production ? gutil.noop(): sourcemaps.write('.', {
+        includeContent: false,
+        sourceRoot: '/static',
+    }))
+    .on('error', swallowError)
+    .pipe(gulp.dest('/data/static/js'));
 
-    bundler.bundle()
-    .pipe(source('./src/index.jsx'))
-        .pipe(buffer())
-        .pipe(config.production ? gutil.noop(): sourcemaps.init({'loadmaps': true}))
-        .pipe(config.production ? uglify() : gutil.noop())
-        .pipe(concat('bundle.js'))
-        .pipe(config.production ? gutil.noop(): sourcemaps.write('.'))
-        .on('error', swallowError)
-        .pipe(gulp.dest('/data/static/js'));
+    if (!config.production) {
+        gulp.src(['src/**/*'], {"base" : "src"}).pipe(gulp.dest('/data/static/src/src'));
+    }
 });
-
 
 gulp.task('watchScripts', ['build'], function() {
     gulp.watch(['src/*.js', 'src/index.jsx', 'src/components/*.jsx'], ['scripts'])

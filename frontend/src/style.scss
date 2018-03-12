@@ -65,23 +65,28 @@ $probing-bg: $orange;
 $topic-bg: $red;
 
 .btn-meta {
-    @include button-variant($white, $meta-bg, $meta-bg);
+    @include button-variant($meta-bg, $meta-bg);
+    color: $white;
 }
 
 .btn-clarifying {
-    @include button-variant($white, $clarifying-bg, $clarifying-bg);
+    @include button-variant($clarifying-bg, $clarifying-bg);
+    color: $white;
 }
 
 .btn-expand {
-    @include button-variant($white, $expand-bg, $expand-bg);
+    @include button-variant($expand-bg, $expand-bg);
+    color: $white;
 }
 
 .btn-probing {
-    @include button-variant($white, $probing-bg, $probing-bg);
+    @include button-variant($probing-bg, $probing-bg);
+    color: $white;
 }
 
 .btn-topic {
-    @include button-variant($white, $topic-bg, $topic-bg);
+    @include button-variant($topic-bg, $topic-bg);
+    color: $white;
 }
 
 
