@@ -1,6 +1,6 @@
 {
   "short_name": "Automoderation",
-  "name": "Non-verbal commiunicator",
+  "name": "Non-verbal tool",
   "icons": [
     {
       "src": "/static/icons/android-chrome-192x192.png",
@@ -13,8 +13,7 @@
       "type": "image/png"
   }
   ],
-  "start_url": "./",
-  "display": "standalone",
+  "display": "browser",
   "theme_color": "#511443",
   "background_color": "#ffffff"
 }
