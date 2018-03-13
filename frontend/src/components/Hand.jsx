@@ -8,11 +8,15 @@ import FontAwesome from 'react-fontawesome';
 
 import { getPriorityStyle } from './../priorities.js';
 
+
 class Hand extends React.Component {
     constructor(props) {
         super(props);
         this.handleClick = this.handleClick.bind(this);
-        this.state
+        this.state = {
+            'verboseAge': this.getVerboseAge(),
+        };
+        console.log(this.state.verboseAge);
     }
 
     handleClick() {
@@ -23,6 +27,7 @@ class Hand extends React.Component {
 
     componentDidMount() {
         this.timer = setInterval(() => {
+            this.state.verboseAge = this.getVerboseAge();
             this.forceUpdate();
         }, 200);
     }
@@ -46,15 +51,19 @@ class Hand extends React.Component {
         return classes.join(' ');
     }
 
-    get age() {
-        return moment.unix(this.props.raisedAt).fromNow();
+    getVerboseAge() {
+        let totalSeconds = (moment().unix() - this.props.raisedAt);
+        var minutes = Math.floor(totalSeconds / 60),
+            seconds = totalSeconds % 60;
+
+        return minutes? `${minutes}m ${seconds}s`: `${seconds}s`;
     }
 
     render() {
         return (
             <Alert color={getPriorityStyle(this.props.priority)} onClick={this.handleClick}>
                 <span>{this.prefix} {this.props.user}</span>
-                <span className="pull-right">{this.age}</span>
+                <span className="pull-right">{this.state.verboseAge}</span>
             </Alert>
         )
     }

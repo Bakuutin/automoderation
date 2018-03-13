@@ -82,6 +82,12 @@ class Room extends React.Component {
         this.onSocketClose();
         this.state.failedAttemptsToConnect++;
 
+        if (this.state.failedAttemptsToConnect > 7) {
+            this.state.failedAttemptsToConnect = 0;
+            this.dropToken();
+            return
+        }
+
         setTimeout(() => {
             this.setSocket();
             this.forceUpdate();
