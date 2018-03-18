@@ -1,8 +1,10 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import { Button, ButtonGroup } from 'reactstrap';
 
-import { numberOfQueues } from './../constants.js';
+import { minPriority, maxPriority } from './../constants.js';
 import { getPriorityName, getPriorityStyle } from './../priorities.js';
 
 
@@ -13,8 +15,8 @@ class Footer extends React.Component {
 
     render() {
         var addMeButtons = [];
-        for (var priority = 0; priority < numberOfQueues; priority++) {
-            if (this.props.askedMap[priority]) {
+        for (var priority = minPriority; priority <= maxPriority; priority++) {
+            if (_.includes(this.props.asked, priority)) {
                 continue
             }
 
@@ -38,7 +40,13 @@ class Footer extends React.Component {
 
 Footer.propTypes = {
     'onSend': PropTypes.func,
-    'askedMap': PropTypes.object,
+    'asked': PropTypes.array,
 }
 
-export default Footer
+const mapStateToProps = (state, ownProps) => {
+    return {
+        asked: _.map(_.filter(state.hands, hand => hand.isOwn), hand => hand.priority),
+    }
+}
+
+export default connect(mapStateToProps, dispatch => {return {}})(Footer);

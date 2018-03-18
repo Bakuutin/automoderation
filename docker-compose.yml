@@ -1,19 +1,14 @@
 version: '2.1'
 services:
   frontend:
-    build:
-      dockerfile: ./docker/frontend.Dockerfile
-      context: .
-    volumes:
-      - static:/data/static/
+    extends:
+      file: ./docker/services.yml
+      service: frontend-${MODE:-dev}
   backend:
-    build:
-      dockerfile: ./docker/backend.Dockerfile
-      context: .
-    volumes:
-      - static:/data/static/
+    extends:
+      file: ./docker/services.yml
+      service: backend-${MODE:-dev}
     ports:
-      - "${PORT:-8080}:8080"
-    restart: unless-stopped
+      - "${PORT:-8080}:80"
 volumes:
   static:

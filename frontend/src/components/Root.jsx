@@ -6,14 +6,15 @@ import {
 } from 'react-router-dom'
 
 import Room from './Room.jsx'
+import NewRoom from './NewRoom.jsx'
 
 class Root extends React.Component {
     render() {
         return (
             <Router hashType="noslash">
                 <Switch>
-                    <Route exact path="/" component={Room}/>
-                    {/* <Route path="/:room" component={Room}/> */}
+                    <Route exact path="/" component={NewRoom}/>
+                    <Route path="/:room" render={props => <Room name={props.match.params['room']}/>}/>
                 </Switch>
             </Router>
         );

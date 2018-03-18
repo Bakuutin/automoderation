@@ -1,11 +1,11 @@
 import React from 'react';
-import { Form, Button, Input } from 'reactstrap';
+import { Form, Button, Input, InputGroup } from 'reactstrap';
 import PropTypes from 'prop-types';
 
 class SigninForm extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {value: ''};
+        this.state = {value: props.initial || ''};
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -30,7 +30,20 @@ class SigninForm extends React.Component {
             <Form className="form-signin" onSubmit={this.handleSubmit}>
                 <h1>{this.props.title}</h1>
                 <h3>{this.props.subtitle}</h3>
-                <Input placeholder={this.props.placeholder} type="text" value={this.state.value} onChange={this.handleChange} required autoFocus/>
+                <InputGroup>
+                    <Input
+                        placeholder={this.props.placeholder}
+                        type="text"
+                        value={this.state.value}
+                        onChange={this.handleChange}
+                        required autoFocus
+                        valid={this.props.errorHand? false: null}
+                        className="rounded"
+                        />
+                    <div className="invalid-feedback">
+                        {this.props.errorHand}
+                    </div>
+                </InputGroup>
                 <Button size="lg" color="primary" block>{this.props.buttonText}</Button>
             </Form>
         );
@@ -40,8 +53,10 @@ class SigninForm extends React.Component {
 SigninForm.propTypes = {
     title: PropTypes.string,
     subtitle: PropTypes.string,
-    placeholder: PropTypes.string,
     buttonText: PropTypes.string,
+    placeholder: PropTypes.string,
+    initial: PropTypes.string,
+    errorHand: PropTypes.string,
     onSubmit: PropTypes.func,
     onChange: PropTypes.func,
 }
