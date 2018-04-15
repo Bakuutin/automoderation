@@ -16,7 +16,6 @@ class Hand extends React.Component {
         this.state = {
             'verboseAge': this.getVerboseAge(),
         };
-        console.log(this.state.verboseAge);
     }
 
     handleClick() {

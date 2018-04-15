@@ -4,9 +4,11 @@ import PropTypes from 'prop-types';
 import Loader from 'react-loaders';
 import _ from 'lodash';
 import axios from 'axios';
-import { numberOfQueues } from './../constants.js';
 import qs from 'qs';
+import ReactGA from 'react-ga';
 
+import log from '../logger.js';
+import { numberOfQueues } from './../constants.js';
 import { setUserName, setToken, handReceieved, resetHands } from '../actions'
 
 import SigninForm from './SigninForm.jsx'
@@ -78,7 +80,7 @@ class Room extends React.Component {
     }
 
     onSocketError() {
-        console.log('Socket error, trying to reconnect')
+        log('Socket error, trying to reconnect')
         this.onSocketClose();
         this.state.failedAttemptsToConnect++;
 
@@ -190,6 +192,11 @@ class Room extends React.Component {
 
     handleSend(priority) {
         this.client.post('/api/hands/', {priority: priority}).catch(this.onRequestError);
+        ReactGA.event({
+            category: 'User',
+            action: 'Raised a hand',
+            value: priority,
+        });
     }
 
     handleCancel(handId) {
