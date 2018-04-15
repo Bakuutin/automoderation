@@ -6,6 +6,7 @@ import persistState from 'redux-sessionstorage'
 
 import reducer from './reducers'
 import Root from './components/Root.jsx'
+import config from './config.js'
 
 const enhancer = compose(
     persistState(['auth']),
