@@ -8,18 +8,21 @@ var browserify  = require('browserify'),
     sass        = require('gulp-sass'),
     source      = require('vinyl-source-stream'),
     buffer      = require('vinyl-buffer'),
-    tap          = require('gulp-tap');
+    fs          = require('fs'),
+    tap         = require('gulp-tap');
 
 var config = {
-    production: !!gutil.env.production
+    production: !!gutil.env.production,
+    googleAnalyticsId: process.env.GOOGLE_ANALYTICS_ID,
 };
+
 
 function swallowError (error) {
     console.log(error.toString())
     this.emit('end')
 }
 
-gulp.task('scripts', function () {
+gulp.task('scripts', ['createConfig'], function () {
     browserify({
         'entries': 'src/index.jsx',
         'debug': !config.production,
@@ -58,6 +61,11 @@ gulp.task('awesome', function() {
     gulp.src('node_modules/font-awesome/fonts/*')
         .pipe(gulp.dest('/data/static/fonts/font-awesome'))
 })
+
+gulp.task('createConfig', function() {
+    console.log(config);
+    fs.writeFile('/data/static/js/config.json', JSON.stringify(config));
+});
 
 gulp.task('roboto', function() {
     gulp.src(
