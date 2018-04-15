@@ -7,6 +7,8 @@ services:
     volumes:
       - static:/data/static/
     restart: unless-stopped
+    environment:
+      GOOGLE_ANALYTICS_ID: $GOOGLE_ANALYTICS_ID
   frontend-prod:
     extends: frontend
     environment:
