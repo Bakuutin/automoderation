@@ -143,13 +143,10 @@ class Room extends React.Component {
             ws.onclose = this.onSocketError;
             ws.onerror = this.onSocketError;
             ws.onmessage = e => this.onHandReceieved(JSON.parse(e.data));
-            console.log(152)
             this.setState({
                 ws: ws,
             });
-            console.log(156)
             this.props.onResetHands();
-            console.log(158)
         }, this.getReconnectTimeout());
     }
 
