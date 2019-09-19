@@ -2,7 +2,7 @@ const nameMap = {
     0: 'Meta',
     1: 'Clarifying question',
     2: 'Expand',
-    3: 'Probing question',
+    3: 'Follow-up question',
     4: 'Change topic',
 };
 

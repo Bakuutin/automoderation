@@ -5,6 +5,9 @@ import {
     Switch,
 } from 'react-router-dom'
 
+
+import config from '../config.js';
+
 import Room from './Room.jsx'
 import NewRoom from './NewRoom.jsx'
 

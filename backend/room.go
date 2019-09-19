@@ -3,8 +3,7 @@ package main
 import (
 	"sync"
 
-	"github.com/gorilla/websocket"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 type roomStorage struct {
@@ -34,9 +33,11 @@ type Room struct {
 	secret  string
 	storage *roomStorage
 	mux     sync.Mutex
+	send    chan *Hand
 
 	users map[uuid.UUID]*User
 	hands map[uuid.UUID]*Hand
+	conns map[uuid.UUID]*WSConnection
 }
 
 const minPriority = 0
@@ -48,52 +49,35 @@ func newRoom(secret string, storage *roomStorage) *Room {
 		storage: storage,
 		users:   make(map[uuid.UUID]*User),
 		hands:   make(map[uuid.UUID]*Hand),
+		conns:   make(map[uuid.UUID]*WSConnection),
 	}
 }
 
-func (room *Room) reserved(userName string) bool {
+func (room *Room) find(userName string) *User {
 	for _, user := range room.users {
 		if user.name == userName {
-			return true
+			return user
 		}
 	}
 
-	return false
+	return nil
 }
 
 func (room *Room) broadcast(hand *Hand) {
-	for _, user := range room.users {
-		if user.conn == nil {
-			continue
-		}
-		user.broadcast(hand)
+	for _, conn := range room.conns {
+		conn.broadcast(hand)
 	}
 }
 
-func (room *Room) connect(user *User, conn *websocket.Conn) {
+func (room *Room) disconnect(conn *WSConnection) {
 	room.mux.Lock()
 	defer room.mux.Unlock()
 
-	user.conn = conn
-	go user.runPing()
-	room.users[user.id] = user
-	for _, hand := range room.hands {
-		user.broadcast(hand)
-	}
-}
-
-func (room *Room) disconnect(user *User) {
-	room.mux.Lock()
-	defer room.mux.Unlock()
-
-	if user.conn != nil {
-		user.conn.Close()
-		user.conn = nil
+	if conn.ws != nil {
+		conn.ws.Close()
 	}
 
-	go user.dropAfterLongDiconnect()
-
-	// TODO: Start self-destruct timer if all users are disconnected
+	delete(room.conns, conn.ID)
 }
 
 func (room *Room) drop(hand *Hand) {

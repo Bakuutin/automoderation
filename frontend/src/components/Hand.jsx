@@ -1,5 +1,4 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Alert } from 'reactstrap';
 import _ from 'lodash';
@@ -62,7 +61,7 @@ class Hand extends React.Component {
         return (
             <Alert color={getPriorityStyle(this.props.priority)} onClick={this.handleClick}>
                 <span>{this.prefix} {this.props.user}</span>
-                <span className="pull-right">{this.state.verboseAge}</span>
+                <span className="float-right">{this.state.verboseAge}</span>
             </Alert>
         )
     }

@@ -6,12 +6,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/satori/go.uuid"
-
 	raven "github.com/getsentry/raven-go"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/thanhpk/randstr"
+	uuid "github.com/satori/go.uuid"
 )
 
 // AuthRequest represents auth request format
@@ -53,22 +51,19 @@ func (storage *roomStorage) serveAuth(w http.ResponseWriter, r *http.Request) {
 	room.mux.Lock()
 	defer room.mux.Unlock()
 
-	if room.reserved(authRequest.UserName) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusConflict)
-		json.NewEncoder(w).Encode(ErrorResponse{Error: "That name is already taken in the room, sorry"})
+	user := room.find(authRequest.UserName)
+
+	if user == nil {
+		user = newUser(authRequest.UserName, room)
+		room.users[user.id] = user
+		storage.users[user.token] = user
 	}
 
-	token := randstr.Hex(32)
-
-	user := newUser(authRequest.UserName, token, room)
-	room.users[user.id] = user
-	storage.users[token] = user
-	go user.dropAfterLongDiconnect()
+	go user.dropIfNotConnectedSoon()
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(TokenResponse{Token: token})
+	json.NewEncoder(w).Encode(TokenResponse{Token: user.token})
 }
 
 // AskToken checks if user token is valid
@@ -99,7 +94,7 @@ func (storage *roomStorage) serveWs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user.room.connect(user, conn)
+	user.connect(conn)
 }
 
 func raiseHand(user *User, w http.ResponseWriter, r *http.Request) {

@@ -29,7 +29,10 @@ const auth = (state = {userName: '', rooms: {}}, action) => {
 const hands = (state = [], action = {}) => {
   switch (action.type) {
     case HAND_ADDED:
-      return _.sortBy(_.concat(state, action.hand), ['priority'])
+      return _.sortBy(
+        _.uniqBy(_.concat(state, action.hand), 'id'),
+        ['priority'],
+      )
     case HAND_DELETED:
       return _.filter(state, (hand) => (hand.id !== action.hand.id))
     case RESET_HANDS:

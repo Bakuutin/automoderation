@@ -1,0 +1,49 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "zzQB4HPb8VA17PWMgcbE3NJDLDI=",
+			"path": "github.com/certifi/gocertifi",
+			"revision": "a5e0173ced670013bfb649c7e806bc9529c986ec",
+			"revisionTime": "2019-09-05T05:32:35Z"
+		},
+		{
+			"checksumSHA1": "DDb/mPtFh1OfbUXdXMaLxio0g48=",
+			"path": "github.com/getsentry/raven-go",
+			"revision": "5c24d5110e0e198d9ae16f1f3465366085001d92",
+			"revisionTime": "2019-06-19T09:25:23Z"
+		},
+		{
+			"checksumSHA1": "wBIyoLIKD2LpgXnG50buI4+lPao=",
+			"path": "github.com/gorilla/handlers",
+			"revision": "8a3748addc242fc560bd6d4ff28b0374c010b1b4",
+			"revisionTime": "2019-07-23T03:58:38Z"
+		},
+		{
+			"checksumSHA1": "Ly2DPGZEU/9uJgLXtlqbJ0rZUAA=",
+			"path": "github.com/gorilla/mux",
+			"revision": "884b5ffcbd3a11b730f0b75f5c86ac408753c34d",
+			"revisionTime": "2019-08-30T12:11:56Z"
+		},
+		{
+			"checksumSHA1": "ajAqUByI39Sfm99F/ZNOguPP3Mk=",
+			"path": "github.com/gorilla/websocket",
+			"revision": "c3e18be99d19e6b3e8f1559eea2c161a665c4b6b",
+			"revisionTime": "2019-08-25T01:20:11Z"
+		},
+		{
+			"checksumSHA1": "Tutue3nEgM/87jitUcYv6ODwyNE=",
+			"path": "github.com/satori/go.uuid",
+			"revision": "b2ce2384e17bbe0c6d34077efa39dbab3e09123b",
+			"revisionTime": "2018-10-28T12:50:25Z"
+		},
+		{
+			"checksumSHA1": "Wvw+ntCbOiAtP3l5F37/lzOL1bE=",
+			"path": "github.com/thanhpk/randstr",
+			"revision": "6e89fe966579c5905054d46d61cf1621ef291e2c",
+			"revisionTime": "2019-05-09T17:48:16Z"
+		}
+	],
+	"rootPath": "automoderation/backend"
+}

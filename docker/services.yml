@@ -5,7 +5,7 @@ services:
       dockerfile: ./docker/frontend.Dockerfile
       context: ..
     volumes:
-      - static:/data/static/
+      - static:/usr/local/app/dist
     restart: unless-stopped
     environment:
       GOOGLE_ANALYTICS_ID: $GOOGLE_ANALYTICS_ID
@@ -13,18 +13,17 @@ services:
     extends: frontend
     environment:
       NODE_ENV: production
-    command: ["node_modules/.bin/gulp", "build", "--production"]
   frontend-dev:
     environment:
       NODE_ENV: debug
     extends: frontend
     volumes:
       - ../frontend/src:/usr/local/app/src
-      - ../frontend/gulpfile.js:/usr/local/app/gulpfile.js:ro
+      - ../frontend/webpack.config.js:/usr/local/app/webpack.config.js:ro
       - ../frontend/package.json:/usr/local/app/package.json:ro
-
-    command: ["node_modules/.bin/gulp", "watch"]
-
+      - ../frontend/index.html:/usr/local/app/index.html:ro
+      - ../.git:/usr/local/app/.git:ro
+    command: ["npm", "run", "watch"]
   backend:
     build:
       dockerfile: ./docker/backend.Dockerfile
