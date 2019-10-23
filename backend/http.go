@@ -12,20 +12,9 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-// AuthRequest represents auth request format
-type AuthRequest struct {
-	RoomSecret string `json:"room"`
-	UserName   string `json:"name"`
-}
-
 // RaiseHandRequest represents raise hand request format
 type RaiseHandRequest struct {
 	Priority uint8 `json:"priority"`
-}
-
-// TokenResponse represents auth response format for registered user
-type TokenResponse struct {
-	Token string `json:"token"`
 }
 
 // ErrorResponse represents auth response format for dismissed user
@@ -33,60 +22,25 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
-func (storage *roomStorage) serveAuth(w http.ResponseWriter, r *http.Request) {
-	var authRequest AuthRequest
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&authRequest)
-
-	if err != nil || authRequest.RoomSecret == "" || authRequest.UserName == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	storage.mux.Lock()
-	defer storage.mux.Unlock()
-
-	room := storage.getOrCreateRoom(authRequest.RoomSecret)
-
-	room.mux.Lock()
-	defer room.mux.Unlock()
-
-	user := room.find(authRequest.UserName)
-
-	if user == nil {
-		user = newUser(authRequest.UserName, room)
-		room.users[user.id] = user
-		storage.users[user.token] = user
-	}
-
-	go user.dropIfNotConnectedSoon()
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(TokenResponse{Token: user.token})
-}
-
-// AskToken checks if user token is valid
-func (storage *roomStorage) AskToken(f func(*User, http.ResponseWriter, *http.Request)) http.HandlerFunc {
+// SetUser checks if user token is valid
+func (storage *roomStorage) SetUser(f func(*User, http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		storage.mux.Lock()
-		user, ok := storage.users[r.Header.Get("Token")]
-		storage.mux.Unlock()
-		if !ok {
-			w.WriteHeader(http.StatusUnauthorized)
+		URLVars := mux.Vars(r)
+		roomID := URLVars["roomID"]
+		userName := URLVars["userName"]
+		if roomID == "" || userName == "" {
+			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+
+		room := storage.getOrCreateRoom(roomID)
+		user := room.getOrCreateUser(userName)
 
 		f(user, w, r)
 	}
 }
 
-func (storage *roomStorage) serveWs(w http.ResponseWriter, r *http.Request) {
-	user, ok := storage.users[r.URL.Query().Get("token")]
-	if !ok {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
+func serveWs(user *User, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		fmt.Println("Error:", err.Error())
@@ -154,12 +108,11 @@ func main() {
 
 	r := mux.NewRouter().StrictSlash(true)
 	r.HandleFunc(`/`, func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "/data/static/index.html") }).Methods("GET")
-	r.HandleFunc(`/auth`, storage.serveAuth).Methods("POST")
-	r.HandleFunc(`/ws`, storage.serveWs)
-
-	hands := r.PathPrefix(`/api/hands`).Subrouter()
-	hands.HandleFunc(`/`, storage.AskToken(raiseHand)).Methods("POST")
-	hands.HandleFunc(`/{handID:[\-a-z0-9]{36}}`, storage.AskToken(dropHand)).Methods("DELETE")
+	user := r.PathPrefix(`/api/rooms/{roomID}/users/{userName}`).Subrouter()
+	user.HandleFunc(`/ws`, storage.SetUser(serveWs))
+	hands := user.PathPrefix(`/hands`).Subrouter()
+	hands.HandleFunc(`/`, storage.SetUser(raiseHand)).Methods("POST")
+	hands.HandleFunc(`/{handID:[\-a-z0-9]{36}}`, storage.SetUser(dropHand)).Methods("DELETE")
 
 	r.PathPrefix(`/static/`).Handler(http.StripPrefix(`/static/`, http.FileServer(http.Dir(`/data/static`))))
 

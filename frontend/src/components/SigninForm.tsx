@@ -1,9 +1,24 @@
-import React from 'react';
+import * as React from 'react';
 import { Form, Button, Input, InputGroup } from 'reactstrap';
-import PropTypes from 'prop-types';
 
-class SigninForm extends React.Component {
-    constructor(props) {
+export interface Props {
+    title: string,
+    subtitle: string,
+    buttonText: string,
+    placeholder: string,
+    initial: string,
+    errorHand?: string,
+    onSubmit: (value: string) => any,
+    onChange?: (value: string) => any,
+}
+
+export interface State {
+    value: string,
+}
+
+
+class SigninForm extends React.Component<Props, State> {
+    constructor(props: Props) {
         super(props);
         this.state = {value: props.initial || ''};
 
@@ -11,15 +26,15 @@ class SigninForm extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleSubmit(event) {
+    handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         if (this.props.onSubmit) {
             this.props.onSubmit(this.state.value);
         }
     }
 
-    handleChange(event) {
-        this.setState({value: event.target.value});
+    handleChange({target: {value}}: any) {
+        this.setState({value});
         if (this.props.onChange) {
             this.props.onChange(this.state.value);
         }
@@ -48,17 +63,6 @@ class SigninForm extends React.Component {
             </Form>
         );
     }
-}
-
-SigninForm.propTypes = {
-    title: PropTypes.string,
-    subtitle: PropTypes.string,
-    buttonText: PropTypes.string,
-    placeholder: PropTypes.string,
-    initial: PropTypes.string,
-    errorHand: PropTypes.string,
-    onSubmit: PropTypes.func,
-    onChange: PropTypes.func,
 }
 
 export default SigninForm;

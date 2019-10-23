@@ -6,16 +6,17 @@ const isDevelopment = process.env.NODE_ENV === 'development'
 
 const config = {
     entry: {
-        index: './src/index.jsx',
+        index: './src/index.tsx',
         style: './src/style.scss',
         fontawesome: '@fortawesome/fontawesome-free/js/all.js',
     },
+    devtool: 'source-map',
     plugins: [
         // new CommonConfigWebpackPlugin(),
         new HtmlWebpackPlugin({
             hash: true,
             filename: 'index.html',
-            template: 'index.html',
+            template: './src/index.html',
             base: '/static/',
         }),
         new MiniCssExtractPlugin({
@@ -24,10 +25,17 @@ const config = {
         }),
     ],
     resolve: {
-        extensions: ['*', '.js', '.jsx', '.scss'],
+        extensions: ['*', '.js', '.jsx', '.scss', '.ts', '.tsx'],
     },
     module: {
-        rules: [{
+        rules: [
+            {
+                test: /\.ts(x?)$/,
+                exclude: /node_modules/,
+                use: ['ts-loader'],
+            },
+            {
+                enforce: 'pre',
                 test: /\.(js|jsx)$/i,
                 exclude: /node_modules/,
                 loaders: ['babel-loader'],

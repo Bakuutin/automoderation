@@ -6,23 +6,20 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/satori/go.uuid"
-	"github.com/thanhpk/randstr"
 )
 
 // User has websocket connection and the room.
 type User struct {
-	name  string
-	room  *Room
-	id    uuid.UUID
-	token string
+	name string
+	room *Room
+	id   uuid.UUID
 }
 
 func newUser(name string, room *Room) *User {
 	return &User{
-		name:  name,
-		room:  room,
-		id:    uuid.Must(uuid.NewV4()),
-		token: randstr.Hex(32),
+		name: name,
+		room: room,
+		id:   uuid.Must(uuid.NewV4()),
 	}
 }
 
@@ -83,8 +80,7 @@ func (user *User) drop() {
 		user.room.drop(hand)
 	}
 
-	delete(user.room.storage.users, user.token)
-	delete(user.room.users, user.id)
+	delete(user.room.users, user.name)
 
 }
 

@@ -1,14 +1,25 @@
-import React from 'react';
+import * as React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import _ from 'lodash';
+import { includes } from 'lodash';
 import { Button, ButtonGroup } from 'reactstrap';
 
-import { minPriority, maxPriority } from './../constants.js';
-import { getPriorityName, getPriorityStyle } from './../priorities.js';
+import { minPriority, maxPriority } from './../constants';
+import { getPriorityName, getPriorityStyle } from './../priorities';
+import { HandData } from './Hand';
 
 
-class Footer extends React.Component {
+export interface Props {
+    onSend: (priority: number) => any,
+    asked: number[],
+}
+
+export interface State {
+    verboseAge: string,
+    timer: number,
+}
+
+
+class Footer extends React.Component<Props, State> {
     sendHandler(priority) {
         return () => this.props.onSend(priority)
     }
@@ -16,7 +27,7 @@ class Footer extends React.Component {
     render() {
         var addMeButtons = [];
         for (var priority = minPriority; priority <= maxPriority; priority++) {
-            if (_.includes(this.props.asked, priority)) {
+            if (includes(this.props.asked, priority)) {
                 continue
             }
 
@@ -38,15 +49,10 @@ class Footer extends React.Component {
     }
 }
 
-Footer.propTypes = {
-    'onSend': PropTypes.func,
-    'asked': PropTypes.array,
-}
-
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state: {hands: HandData[]}, ownProps) => {
     return {
-        asked: _.map(_.filter(state.hands, hand => hand.isOwn), hand => hand.priority),
+        asked: state.hands.filter(hand => hand.isOwn).map(hand => hand.priority)
     }
 }
 
-export default connect(mapStateToProps, dispatch => {return {}})(Footer);
+export default connect(mapStateToProps, () => {return {}})(Footer);

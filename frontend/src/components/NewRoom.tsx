@@ -1,17 +1,16 @@
-import React from 'react';
+import * as React from 'react';
 import { Redirect } from 'react-router'
 
-import randomstring from 'randomstring'
+import * as randomstring from 'randomstring'
 
 
 class NewRoom extends React.Component {
     render() {
-        return <Redirect to={"/" + this.randomName}/>
+        return <Redirect to={'/' + this.getRandomName()}/>
     }
 
-    constructor(props) {
-        super(props);
-        this.randomName = randomstring.generate({
+    getRandomName() {
+        return randomstring.generate({
             length: 32,
             charset: 'alphanumeric',
             readable: true,

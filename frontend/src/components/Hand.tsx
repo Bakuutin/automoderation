@@ -1,19 +1,36 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 import { Alert } from 'reactstrap';
-import _ from 'lodash';
-import moment from 'moment';
-import FontAwesome from 'react-fontawesome';
+import * as moment from 'moment';
+import * as FontAwesome from 'react-fontawesome';
 
-import { getPriorityStyle } from './../priorities.js';
+import { getPriorityStyle } from './../priorities';
 
+export interface HandData {
+    id: string,
+    user: string,
+    priority: number,
+    cancel: boolean,
+    raisedAt: number,
+    isOwn: boolean,
+}
 
-class Hand extends React.Component {
-    constructor(props) {
+export interface Props extends HandData {
+    onCancel: (id: string) => any,
+    position: number,
+}
+
+export interface State {
+    verboseAge: string,
+    timer: number,
+}
+
+class Hand extends React.Component<Props, State> {
+    constructor(props: Props) {
         super(props);
         this.handleClick = this.handleClick.bind(this);
         this.state = {
-            'verboseAge': this.getVerboseAge(),
+            verboseAge: this.getVerboseAge(),
+            timer: window.setInterval(() => this.setState({verboseAge: this.getVerboseAge()}), 200),
         };
     }
 
@@ -23,15 +40,8 @@ class Hand extends React.Component {
         }
     }
 
-    componentDidMount() {
-        this.timer = setInterval(() => {
-            this.state.verboseAge = this.getVerboseAge();
-            this.forceUpdate();
-        }, 200);
-    }
-
     componentWillUnmount() {
-        clearInterval(this.timer);
+        clearInterval(this.state.timer);
     }
 
     get prefix() {
@@ -43,7 +53,7 @@ class Hand extends React.Component {
         if (this.props.position === 0) {
             classes.push('hand-top');
         }
-        if (this.isOwn) {
+        if (this.props.isOwn) {
             classes.push('hand-own');
         }
         return classes.join(' ');
@@ -59,23 +69,12 @@ class Hand extends React.Component {
 
     render() {
         return (
-            <Alert color={getPriorityStyle(this.props.priority)} onClick={this.handleClick}>
+            <Alert color={getPriorityStyle(this.props.priority)} onClick={this.handleClick} className={this.alertClass}>
                 <span>{this.prefix} {this.props.user}</span>
                 <span className="float-right">{this.state.verboseAge}</span>
             </Alert>
         )
     }
-}
-
-Hand.propTypes = {
-    'user': PropTypes.string,
-    'id': PropTypes.string,
-    'priority': PropTypes.number,
-    'cancel': PropTypes.bool,
-    'raisedAt': PropTypes.number,
-    'onCancel': PropTypes.func,
-    'isOwn': PropTypes.bool,
-    'position': PropTypes.number,
 }
 
 export default Hand;

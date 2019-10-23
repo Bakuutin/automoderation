@@ -8,18 +8,19 @@ import (
 
 type roomStorage struct {
 	rooms map[string]*Room
-	users map[string]*User
 	mux   sync.Mutex
 }
 
 func newRoomStorage() *roomStorage {
 	return &roomStorage{
 		rooms: make(map[string]*Room),
-		users: make(map[string]*User),
 	}
 }
 
 func (s *roomStorage) getOrCreateRoom(secret string) *Room {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
 	room, ok := s.rooms[secret]
 	if !ok {
 		room = newRoom(secret, s)
@@ -35,7 +36,7 @@ type Room struct {
 	mux     sync.Mutex
 	send    chan *Hand
 
-	users map[uuid.UUID]*User
+	users map[string]*User
 	hands map[uuid.UUID]*Hand
 	conns map[uuid.UUID]*WSConnection
 }
@@ -47,20 +48,10 @@ func newRoom(secret string, storage *roomStorage) *Room {
 	return &Room{
 		secret:  secret,
 		storage: storage,
-		users:   make(map[uuid.UUID]*User),
+		users:   make(map[string]*User),
 		hands:   make(map[uuid.UUID]*Hand),
 		conns:   make(map[uuid.UUID]*WSConnection),
 	}
-}
-
-func (room *Room) find(userName string) *User {
-	for _, user := range room.users {
-		if user.name == userName {
-			return user
-		}
-	}
-
-	return nil
 }
 
 func (room *Room) broadcast(hand *Hand) {
@@ -84,4 +75,16 @@ func (room *Room) drop(hand *Hand) {
 	hand.Cancel = true
 	room.broadcast(hand)
 	delete(room.hands, hand.ID)
+}
+
+func (room *Room) getOrCreateUser(name string) *User {
+	room.mux.Lock()
+	defer room.mux.Unlock()
+
+	user, ok := room.users[name]
+	if !ok {
+		user = newUser(name, room)
+		room.users[name] = user
+	}
+	return user
 }
