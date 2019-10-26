@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { bindActionCreators, Dispatch, Action } from 'redux';
+import { Dispatch, Action } from 'redux';
 import { connect } from 'react-redux';
 import { merge, map } from 'lodash';
 import axios from 'axios';
