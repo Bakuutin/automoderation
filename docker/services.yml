@@ -7,8 +7,6 @@ services:
     volumes:
       - static:/usr/local/app/dist
     restart: unless-stopped
-    environment:
-      GOOGLE_ANALYTICS_ID: $GOOGLE_ANALYTICS_ID
   frontend-prod:
     extends: frontend
     environment:
@@ -21,7 +19,6 @@ services:
       - ../frontend/src:/usr/local/app/src
       - ../frontend/webpack.config.js:/usr/local/app/webpack.config.js:ro
       - ../frontend/package.json:/usr/local/app/package.json:ro
-      - ../frontend/index.html:/usr/local/app/index.html:ro
       - ../.git:/usr/local/app/.git:ro
     command: ["npm", "run", "watch"]
   backend:
