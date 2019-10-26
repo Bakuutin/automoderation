@@ -62,7 +62,6 @@ class dRoom extends React.Component<Props, State> {
         this.onSocketError = this.onSocketError.bind(this);
         this.onSocketConnected = this.onSocketConnected.bind(this);
         this.onSetUserName = this.onSetUserName.bind(this);
-        this.onRequestError = this.onRequestError.bind(this);
 
         this.state = {
             ws: null,
@@ -84,6 +83,7 @@ class dRoom extends React.Component<Props, State> {
     }
 
     onSocketError() {
+        console.error('WS disconnected')
         this.setState({
             ws: null,
             connected: false,
@@ -98,19 +98,8 @@ class dRoom extends React.Component<Props, State> {
         })
     }
 
-    onRequestError() {
-        this.setState({
-            connected: false,
-            ws: null,
-            attemptsToConnect: this.state.attemptsToConnect + 1,
-        });
-    }
-
     get client() {
-        return axios.create({
-            headers: {'Token': this.props.token || ''},
-            timeout: 2000,
-        })
+        return axios.create({ timeout: 2000 })
     }
 
     get path() {

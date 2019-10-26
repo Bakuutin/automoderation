@@ -8,7 +8,7 @@ export const Root = ()=> {
     return (
         <Router hashType="noslash">
             <Switch>
-                <Route exact path="/" component={NewRoom}/>
+                <Route exact path="/" render={() => <NewRoom/>}/>
                 <Route path="/:room" render={props => <Room name={props.match.params['room']}/>}/>
             </Switch>
         </Router>
