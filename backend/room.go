@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"sync"
 
 	uuid "github.com/satori/go.uuid"
@@ -20,6 +21,8 @@ func newRoomStorage() *roomStorage {
 func (s *roomStorage) getOrCreateRoom(secret string) *Room {
 	s.mux.Lock()
 	defer s.mux.Unlock()
+
+	secret = strings.ToLower(secret)
 
 	room, ok := s.rooms[secret]
 	if !ok {
