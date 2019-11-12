@@ -49,6 +49,10 @@ spec:
         - name: {{ $key }}
           value: {{ $value | quote }}
         {{- end }}
+        ports:
+          - name: http
+            protocol: TCP
+            containerPort: 80
         volumeMounts:
         - name: front-data
           mountPath: /data/static/
