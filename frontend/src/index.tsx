@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { compose, createStore } from 'redux';
 
 import reducer from './reducers';
-import Root from './components/Root';
+import { Root } from './components/Root';
 
 // const enhancer = compose(
 //     persistState(['auth']),

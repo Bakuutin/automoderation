@@ -16,11 +16,8 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 {{- end -}}
 
-{{- define "chart_label" }}
-chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
-{{- end }}
-
 {{- define "base_labels" }}
+chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 app.kubernetes.io/name: {{ template "automoderation.fullname" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/instance: {{ .Release.Name }}

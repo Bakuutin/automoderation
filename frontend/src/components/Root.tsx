@@ -11,7 +11,7 @@ const getRandomName = () => {
     })
 }
 
-const Root = ()=> {
+export const Root = ()=> {
     return (
         <Router hashType="noslash">
             <Switch>
@@ -26,6 +26,3 @@ const Root = ()=> {
         </Router>
     );
 };
-
-
-export default withRouter(Root);
