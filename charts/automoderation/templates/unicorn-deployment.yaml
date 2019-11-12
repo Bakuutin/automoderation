@@ -1,0 +1,67 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "automoderation.fullname" . }}-unicorn
+  labels:
+    {{ include "base_labels" . | indent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{ include "unicorn_labels" . | indent 6 }}
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 2
+  template:
+    metadata:
+      name: {{ template "automoderation.fullname" . }}-backend
+      labels:
+        {{ include "base_labels" . | indent 8 }}
+    spec:
+      initContainers:
+      - name: frontend
+        image: "{{ .Values.image.repository }}-frontend:{{ .Values.image.tag }}"
+        volumeMounts:
+        - name: front-data
+          mountPath: /usr/local/app/dist
+        env:
+        - name: NODE_ENV
+          value: production
+        {{- range $key, $value := .Values.frontend.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        {{- range $key, $value := .Values.frontend.secrets }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+      containers:
+      - name: backend
+        image: "{{ .Values.image.repository }}-backend:{{ .Values.image.tag }}"
+        env:
+        {{- range $key, $value := .Values.backend.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        {{- range $key, $value := .Values.backend.secrets }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        volumeMounts:
+        - name: front-data
+          mountPath: /data/static/
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 20
+      volumes:
+      - name: front-data
+        emptyDir: {}
