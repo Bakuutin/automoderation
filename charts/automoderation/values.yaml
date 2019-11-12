@@ -1,7 +1,7 @@
 host: automoderation.y.friendzone.bot
 
 image:
-  repository: docker-registry.friendzone.bot/main/community/community
+  repository: docker-registry.friendzone.bot/main/automoderation
   tag: latest
 
 backend:
