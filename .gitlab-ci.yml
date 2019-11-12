@@ -4,6 +4,7 @@ build-front:
   script:
     - cd $CI_PROJECT_DIR
     - dockerd --host=unix:///var/run/docker.sock > /usr/local/bin/nohup.out 2>&1 &
+    - sleep 5
     - docker pull $FRONTEND_IMAGE:latest || true
     - docker build --cache-from $FRONTEND_IMAGE:latest --tag $FRONTEND_IMAGE:$CI_COMMIT_SHA --tag $FRONTEND_IMAGE:latest -f ./docker/frontend.Dockerfile .
     - docker push $FRONTEND_IMAGE:$CI_COMMIT_SHA
@@ -15,6 +16,7 @@ build-back:
   script:
     - cd $CI_PROJECT_DIR
     - dockerd --host=unix:///var/run/docker.sock > /usr/local/bin/nohup.out 2>&1 &
+    - sleep 5
     - docker pull $BACKEND_IMAGE:latest || true
     - docker build --cache-from $BACKEND_IMAGE:latest --tag $BACKEND_IMAGE:$CI_COMMIT_SHA --tag $BACKEND_IMAGE:latest -f ./docker/backend.Dockerfile .
     - docker push $BACKEND_IMAGE:$CI_COMMIT_SHA
