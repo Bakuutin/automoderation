@@ -4,11 +4,6 @@ image:
   repository: docker-registry.friendzone.bot/main/community/community
   tag: latest
 
-ingress:
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
-    cert-manager.io/issuer: "letsencrypt-prod"
-
 backend:
   env: []
   secrets: []
