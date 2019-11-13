@@ -12,8 +12,8 @@ spec:
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 2
+      maxUnavailable: 1
+      maxSurge: 0
   template:
     metadata:
       name: {{ template "automoderation.fullname" . }}-backend

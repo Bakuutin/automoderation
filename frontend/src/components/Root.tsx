@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as randomstring from 'randomstring'
 import { HashRouter as Router, Route, Switch, Redirect, withRouter } from 'react-router-dom'
 import Room from './Room'
+import { RoomShare } from './Share'
 
 const getRandomName = () => {
     return randomstring.generate({
@@ -19,7 +20,7 @@ export const Root = ()=> {
                     <Redirect to={`/${getRandomName()}`}/>
                 </Route>
                 <Route path="/:room">
-                    <Route path="/:room/share" render={props => <h1>Share</h1>}/>
+                    <Route path="/:room/share" render={props => <RoomShare name={props.match.params['room']}/>}/>
                     <Route exact path="/:room" render={props => <Room name={props.match.params['room']}/>}/>
                 </Route>
             </Switch>

@@ -3,7 +3,7 @@ import { Dispatch, Action } from 'redux';
 import { connect } from 'react-redux';
 import { merge, map } from 'lodash';
 import axios from 'axios';
-import Loader from 'react-loaders'
+import Loader from 'react-loaders';
 
 import { setUserName, handReceieved, resetHands } from '../actions'
 
@@ -11,7 +11,7 @@ import SigninForm from './SigninForm'
 import Hand, { HandData } from './Hand'
 import Footer from './Footer'
 import { AssertionError } from 'assert';
-
+import { Link } from 'react-router-dom';
 
 export interface Props {
     userName?: string,
@@ -106,7 +106,7 @@ class dRoom extends React.Component<Props, State> {
         if (!this.props.userName) {
             throw new AssertionError({message: 'Missing username'})
         }
-        return `/api/rooms/${this.props.name}/users/${this.props.userName}`
+        return `/api/rooms/${encodeURIComponent(this.props.name)}/users/${encodeURIComponent(this.props.userName)}`
     }
 
     onSetUserName(name: string) {
@@ -190,12 +190,16 @@ class dRoom extends React.Component<Props, State> {
         }
         return (
             <div>
+                <div>
+                    <Link className="btn btn-link mx-auto d-block" to={`/${this.props.name}/share`}>Share</Link>
+                </div>
                 <div className="queues">{this.hands}</div>
                 <Footer onSend={this.handleSend}/>
             </div>
         );
     }
 }
+
 
 export const Room = connect(mapStateToProps, mapDispatchToProps)(dRoom)
 export default Room;

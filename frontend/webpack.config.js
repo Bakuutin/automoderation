@@ -1,14 +1,15 @@
 // const CommonConfigWebpackPlugin = require('common-config-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const CopyPlugin = require('copy-webpack-plugin');
 
 const isDevelopment = process.env.NODE_ENV === 'development'
 
 const config = {
     entry: {
-        index: './src/index.tsx',
         style: './src/style.scss',
         fontawesome: '@fortawesome/fontawesome-free/js/all.js',
+        index: './src/index.tsx',
     },
     devtool: 'source-map',
     plugins: [
@@ -23,6 +24,7 @@ const config = {
             filename: '[name].[hash].css',
             chunkFilename: '[id].[hash].css',
         }),
+        new CopyPlugin(['public']),
     ],
     resolve: {
         extensions: ['*', '.js', '.jsx', '.scss', '.ts', '.tsx'],
