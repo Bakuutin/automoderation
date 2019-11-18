@@ -24,7 +24,13 @@ const getRandomName = () => {
 
 const history = createBrowserHistory()
 
-ReactGA.initialize(process.env.GOOGLE_ANALYTICS_ID);
+const debug = process.env.NODE_ENV === 'development';
+
+ReactGA.initialize(process.env.GOOGLE_ANALYTICS_ID, {
+    debug: debug,
+    gaAddress: process.env.GOOGLE_ANALYTICS_URL,
+    testMode: debug,
+});
 
 const store = configureStore({}, history);
 

@@ -11,6 +11,7 @@ backend:
 frontend:
   env:
     GOOGLE_ANALYTICS_ID: 'UA-117518533-1'
+    GOOGLE_ANALYTICS_URL: 'https://aproxy.y.friendzone.bot/analytics.js'
   secrets: []
   extra_head: |
     <!-- Google Tag Manager -->

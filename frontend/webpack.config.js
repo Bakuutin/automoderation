@@ -19,7 +19,9 @@ const config = {
     devtool: 'source-map',
     plugins: [
         new webpack.EnvironmentPlugin({
+            NODE_ENV: 'production',
             GOOGLE_ANALYTICS_ID: '',
+            GOOGLE_ANALYTICS_URL: 'https://www.google-analytics.com/analytics_debug.js',
         }),
         new HtmlWebpackPlugin({
             hash: true,
