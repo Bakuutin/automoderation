@@ -44,9 +44,6 @@ type Room struct {
 	conns map[uuid.UUID]*WSConnection
 }
 
-const minPriority = 0
-const maxPriority = 4
-
 func newRoom(secret string, storage *roomStorage) *Room {
 	return &Room{
 		secret:  secret,

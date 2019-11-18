@@ -1,14 +1,30 @@
 version: '2.1'
 services:
   frontend:
-    extends:
-      file: ./docker/services.yml
-      service: frontend-${MODE:-dev}
+    build:
+      dockerfile: ./docker/frontend.Dockerfile
+      context: .
+    volumes:
+    restart: unless-stopped
+    environment:
+      NODE_ENV: debug
+      GOOGLE_ANALYTICS_ID: "${GOOGLE_ANALYTICS_ID}"
+    volumes:
+      - static:/usr/local/app/dist
+      - ./frontend/src:/usr/local/app/src
+      - ./frontend/webpack.config.js:/usr/local/app/webpack.config.js:ro
+      - ./frontend/package.json:/usr/local/app/package.json:ro
+    command: ['npm', 'run', 'watch']
   backend:
-    extends:
-      file: ./docker/services.yml
-      service: backend-${MODE:-dev}
+    build:
+      dockerfile: ./docker/backend.Dockerfile
+      context: .
+    volumes:
+      - static:/data/static/
+      - ./backend:/go/src/automoderation
     ports:
       - "${PORT:-8080}:80"
+  # postgres:
+  #   image: postgres:9.6-alpine
 volumes:
   static:

@@ -38,7 +38,7 @@ class dRoomShare extends React.Component<Props, State> {
     }
 
     get link() {
-        return `${apiHost}/#${this.props.name}`
+        return `${apiHost}/${this.props.name}`
     }
 
     handleShare() {
@@ -51,7 +51,8 @@ class dRoomShare extends React.Component<Props, State> {
     }
 
     render() {
-        var shareButton
+        let shareButton: React.ReactElement
+
         if (navigator.share) {
             shareButton = (
                 <button className="btn mt-3 btn-lg btn-primary mx-auto d-block" onClick={this.handleShare}>

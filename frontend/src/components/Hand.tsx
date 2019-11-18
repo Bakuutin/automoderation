@@ -2,8 +2,10 @@ import * as React from 'react';
 import { Alert } from 'reactstrap';
 import * as moment from 'moment';
 import * as FontAwesome from 'react-fontawesome';
+import ReactGA from 'react-ga';
 
-import { getPriorityStyle } from './../priorities';
+
+import { priorities } from './../priorities';
 
 export interface HandData {
     id: string,
@@ -36,6 +38,10 @@ class Hand extends React.Component<Props, State> {
 
     handleClick() {
         if (this.props.isOwn) {
+            ReactGA.event({
+                category: 'Hand Lowered',
+                action: this.props.priority.toString(),
+            });
             this.props.onCancel(this.props.id);
         }
     }
@@ -49,7 +55,7 @@ class Hand extends React.Component<Props, State> {
     }
 
     get alertClass() {
-        var classes = ['hand'];
+        const classes = ['hand'];
         if (this.props.position === 0) {
             classes.push('hand-top');
         }
@@ -60,16 +66,17 @@ class Hand extends React.Component<Props, State> {
     }
 
     getVerboseAge() {
-        let totalSeconds = (moment().unix() - this.props.raisedAt);
-        var minutes = Math.floor(totalSeconds / 60),
+        const
+            totalSeconds = (moment().unix() - this.props.raisedAt),
+            minutes = Math.floor(totalSeconds / 60),
             seconds = totalSeconds % 60;
 
-        return minutes? `${minutes}m ${seconds}s`: `${seconds}s`;
+        return minutes? `${minutes}m ${seconds}s`: `${seconds}s`
     }
 
     render() {
         return (
-            <Alert color={getPriorityStyle(this.props.priority)} onClick={this.handleClick} className={this.alertClass}>
+            <Alert color={priorities[this.props.priority].style} onClick={this.handleClick} className={this.alertClass}>
                 <span>{this.prefix} {this.props.user}</span>
                 <span className="float-right">{this.state.verboseAge}</span>
             </Alert>

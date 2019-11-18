@@ -3,8 +3,7 @@ import { connect } from 'react-redux';
 import { includes } from 'lodash';
 import { Button, ButtonGroup } from 'reactstrap';
 
-import { minPriority, maxPriority } from './../constants';
-import { getPriorityName, getPriorityStyle } from './../priorities';
+import { priorities } from './../priorities';
 import { HandData } from './Hand';
 
 
@@ -25,19 +24,25 @@ class Footer extends React.Component<Props, State> {
     }
 
     render() {
-        var addMeButtons = [];
-        for (var priority = minPriority; priority <= maxPriority; priority++) {
+        let addMeButtons = [];
+        for (let priority = 0; priority < priorities.length; priority++) {
             if (includes(this.props.asked, priority)) {
+                continue
+            }
+
+            const {name, style, hide} = priorities[priority]
+
+            if (hide) {
                 continue
             }
 
             addMeButtons.push(
                 <Button
-                    color={getPriorityStyle(priority)}
+                    color={style}
                     onClick={this.sendHandler(priority)}
                     key={priority}
                 >
-                    {getPriorityName(priority)}
+                    {name}
                 </Button>
             );
         }

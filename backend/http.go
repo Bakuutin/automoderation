@@ -54,9 +54,8 @@ func serveWs(user *User, w http.ResponseWriter, r *http.Request) {
 func raiseHand(user *User, w http.ResponseWriter, r *http.Request) {
 	var handRequest RaiseHandRequest
 	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&handRequest)
 
-	if err != nil || handRequest.Priority > maxPriority || handRequest.Priority < minPriority {
+	if err := decoder.Decode(&handRequest); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -84,7 +83,7 @@ func dropHand(user *User, w http.ResponseWriter, r *http.Request) {
 
 	handID, err := uuid.FromString(URLVars["handID"])
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -94,7 +93,7 @@ func dropHand(user *User, w http.ResponseWriter, r *http.Request) {
 	for _, hand := range user.room.hands {
 		if hand.User == user && hand.ID == handID {
 			user.room.drop(hand)
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusNoContent)
 			w.Write(hand.Bytes())
 			return
 		}
@@ -107,7 +106,7 @@ func main() {
 	storage := newRoomStorage()
 
 	r := mux.NewRouter().StrictSlash(true)
-	r.HandleFunc(`/`, func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "/data/static/index.html") }).Methods("GET")
+
 	user := r.PathPrefix(`/api/rooms/{roomID}/users/{userName}`).Subrouter()
 	user.HandleFunc(`/ws`, storage.SetUser(serveWs))
 	hands := user.PathPrefix(`/hands`).Subrouter()
@@ -115,6 +114,7 @@ func main() {
 	hands.HandleFunc(`/{handID:[\-a-z0-9]{36}}`, storage.SetUser(dropHand)).Methods("DELETE")
 
 	r.PathPrefix(`/static/`).Handler(http.StripPrefix(`/static/`, http.FileServer(http.Dir(`/data/static`))))
+	r.PathPrefix(`/`).HandlerFunc(func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "/data/static/index.html") }).Methods("GET")
 
 	raven.SetDSN(os.Getenv("SENTRY_DSN"))
 	handler := http.HandlerFunc(raven.RecoveryHandler(r.ServeHTTP))

@@ -19,8 +19,13 @@
     <!-- <link rel="manifest" href="/static/manifest.json"> -->
     <title>Automoderation</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap&subset=cyrillic,cyrillic-ext,latin-ext" rel="stylesheet">
+    <script>
+      dataLayer = [];
+    </script>
+    <%= htmlWebpackPlugin.options.extraHead %>
   </head>
   <body ontouchstart="">
+    <%= htmlWebpackPlugin.options.extraBody %>
     <div id="root" class="container"></div>
   </body>
 </html>

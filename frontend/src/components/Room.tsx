@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { merge, map } from 'lodash';
 import axios from 'axios';
 import Loader from 'react-loaders';
+import ReactGA from 'react-ga';
 
 import { setUserName, handReceieved, resetHands } from '../actions'
 
@@ -110,6 +111,7 @@ class dRoom extends React.Component<Props, State> {
     }
 
     onSetUserName(name: string) {
+        ReactGA.set({'userName': name})
         this.props.onSetUserName(name);
     }
 
@@ -164,7 +166,12 @@ class dRoom extends React.Component<Props, State> {
     }
 
     handleSend(priority: number) {
-        this.client.post(`${apiHost}${this.path}/hands/`, {priority: priority});
+        ReactGA.event({
+            category: 'Hand Raised',
+            action: priority.toString(),
+        });
+
+        this.client.post(`${apiHost}${this.path}/hands/`, {priority});
     }
 
     handleCancel(handId: string) {

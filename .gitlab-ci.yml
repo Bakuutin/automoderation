@@ -28,7 +28,7 @@ stages:
 
 deploy:
   stage: deploy
-  image: dtzar/helm-kubectl
+  image: dtzar/helm-kubectl:2.16.1
   script:
     - kubectl config set-cluster "$CI_PROJECT_ID" --server="$KUBE_URL" --certificate-authority="$KUBE_CA_PEM_FILE"
     - kubectl config set-credentials "$CI_PROJECT_ID" --token="$KUBE_TOKEN"

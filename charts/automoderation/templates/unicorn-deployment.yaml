@@ -26,9 +26,15 @@ spec:
         volumeMounts:
         - name: front-data
           mountPath: /usr/local/app/dist
+        - mountPath: /etc/extra_html/
+          name: extra-html
         env:
         - name: NODE_ENV
           value: production
+        - name: EXTRA_HEAD
+          value: /etc/extra_html/extra_head.html
+        - name: EXTRA_BODY
+          value: /etc/extra_html/extra_body.html
         {{- range $key, $value := .Values.frontend.env }}
         - name: {{ $key }}
           value: {{ $value | quote }}
@@ -69,3 +75,11 @@ spec:
       volumes:
       - name: front-data
         emptyDir: {}
+      - name: extra-html
+        configMap:
+          name: "{{ template "automoderation.fullname" . }}-extra-html"
+          items:
+          - key: extra_head.html
+            path: extra_head.html
+          - key: extra_body.html
+            path: extra_body.html

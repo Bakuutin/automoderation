@@ -1,9 +1,14 @@
-// const CommonConfigWebpackPlugin = require('common-config-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 
-const isDevelopment = process.env.NODE_ENV === 'development'
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+let extraHead = '',
+    extraBody = '';
+if (process.env.EXTRA_HEAD) extraHead = fs.readFileSync(process.env.EXTRA_HEAD, 'utf8');
+if (process.env.EXTRA_BODY) extraBody = fs.readFileSync(process.env.EXTRA_BODY, 'utf8');
 
 const config = {
     entry: {
@@ -13,12 +18,16 @@ const config = {
     },
     devtool: 'source-map',
     plugins: [
-        // new CommonConfigWebpackPlugin(),
+        new webpack.EnvironmentPlugin({
+            GOOGLE_ANALYTICS_ID: '',
+        }),
         new HtmlWebpackPlugin({
             hash: true,
-            filename: 'index.html',
-            template: './src/index.html',
             base: '/static/',
+            filename: 'index.html',
+            template: './src/index.ejs',
+            extraHead: extraHead,
+            extraBody: extraBody,
         }),
         new MiniCssExtractPlugin({
             filename: '[name].[hash].css',
@@ -81,6 +90,6 @@ const config = {
             },
         ]
     }
-}
+};
 
-module.exports = config
+module.exports = config;
