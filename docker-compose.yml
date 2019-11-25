@@ -29,6 +29,7 @@ services:
       REDIS_PASSWORD: ""
       REDIS_URL: "redis:6379"
       REDIS_DB: 0
+    command: ["fresh"]
   migrate:
     volumes:
       - ./backend/migrations:/migrations

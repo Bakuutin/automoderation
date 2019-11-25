@@ -193,9 +193,9 @@ func setNewTrackID(secure *securecookie.SecureCookie, db *pgx.Conn, w http.Respo
 	var encoded string
 	if encoded, err = secure.Encode(trackingCookieName, value.String()); err == nil {
 		cookie := &http.Cookie{
-			Name:  trackingCookieName,
-			Value: encoded,
-			Path:  "/",
+			Name:     trackingCookieName,
+			Value:    encoded,
+			Path:     "/",
 			Secure:   true,
 			HttpOnly: true,
 			Expires:  time.Now().AddDate(2, 0, 2),
