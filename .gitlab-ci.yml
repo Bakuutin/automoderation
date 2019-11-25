@@ -47,7 +47,7 @@ migrate:
   stage: deploy
   image: migrate/migrate:v4.7.0
   script:
-    - create -path backend/migrations -database ${POSTGRES_URL}
+    - /migrate -path backend/migrations -database ${POSTGRES_URL} up
   only:
   - master
 
