@@ -10,7 +10,7 @@ backend:
   postgres_url: ""
 
 redis:
-  password: ""
+  password: "pZ8OR5I53U0nE4j25vkvGgSODgZdvDQ5"
 
 frontend:
   env:
