@@ -36,10 +36,18 @@ deploy:
     - kubectl config use-context "$CI_PROJECT_ID"
     - helm init --upgrade
     - helm repo add stable https://kubernetes-charts.storage.googleapis.com
-    - helm upgrade --install automoderation --namespace default --atomic --set image.tag=${CI_COMMIT_SHA} charts/automoderation
+    - helm upgrade --install automoderation --namespace default --atomic --set image.tag=${CI_COMMIT_SHA} --set backend.postgres_url=${POSTGRES_URL} charts/automoderation
   environment:
     name: production
     url: https://automoderation.y.friendzone.bot
+  only:
+  - master
+
+migrate:
+  stage: deploy
+  image: migrate/migrate:v4.7.0
+  script:
+    - create -path backend/migrations -database ${POSTGRES_URL}
   only:
   - master
 

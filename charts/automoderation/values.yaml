@@ -7,6 +7,10 @@ image:
 backend:
   env: []
   secrets: []
+  postgres_url: ""
+
+redis:
+  password: ""
 
 frontend:
   env:
