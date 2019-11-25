@@ -50,7 +50,7 @@ spec:
         - name: REDIS_URL
           value: {{ .Release.Name }}-redis-master
         - name: REDIS_DB
-          value: 0
+          value: '0'
         - name: REDIS_PASSWORD
           value: {{ .Values.redis.password | quote }}
         - name: POSTGRES_URL
