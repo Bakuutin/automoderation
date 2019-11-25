@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: debug
-      GOOGLE_ANALYTICS_ID: "${GOOGLE_ANALYTICS_ID}"
+      # GOOGLE_ANALYTICS_ID: "${GOOGLE_ANALYTICS_ID}"
     volumes:
       - static:/usr/local/app/dist
       - ./frontend/src:/usr/local/app/src
@@ -24,7 +24,22 @@ services:
       - ./backend:/go/src/automoderation
     ports:
       - "${PORT:-8080}:80"
-  # postgres:
-  #   image: postgres:9.6-alpine
+    environment:
+      POSTGRES_URL: postgres://postgres@postgres:5432/postgres?sslmode=disable
+      REDIS_PASSWORD: ""
+      REDIS_URL: "redis:6379"
+      REDIS_DB: 0
+  migrate:
+    volumes:
+      - ./backend/migrations:/migrations
+    environment:
+      POSTGRES_URL: postgres://postgres@postgres:5432/postgres?sslmode=disable
+    image: migrate/migrate:v4.7.0
+    entrypoint: []
+    command: ['sleep', '9223372036854775807']
+  postgres:
+    image: postgres:9.6-alpine
+  redis:
+    image: redis
 volumes:
   static:

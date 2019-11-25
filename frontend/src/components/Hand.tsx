@@ -67,9 +67,13 @@ class Hand extends React.Component<Props, State> {
 
     getVerboseAge() {
         const
-            totalSeconds = (moment().unix() - this.props.raisedAt),
+            totalSeconds = Math.round(moment().unix() - this.props.raisedAt / 1e9),
             minutes = Math.floor(totalSeconds / 60),
             seconds = totalSeconds % 60;
+
+        if (totalSeconds < 5) {
+            return `now`
+        }
 
         return minutes? `${minutes}m ${seconds}s`: `${seconds}s`
     }

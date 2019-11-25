@@ -28,6 +28,13 @@ spec:
           mountPath: /usr/local/app/dist
         - mountPath: /etc/extra_html/
           name: extra-html
+      - name: migrations
+        image: "{{ .Values.image.repository }}-backend:{{ .Values.image.tag }}"
+        volumeMounts:
+        - name: front-data
+          mountPath: /usr/local/app/dist
+        - mountPath: /etc/extra_html/
+          name: extra-html
         env:
         - name: NODE_ENV
           value: production
