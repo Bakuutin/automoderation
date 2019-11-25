@@ -54,7 +54,7 @@ spec:
         - name: REDIS_PASSWORD
           value: {{ .Values.redis.password | quote }}
         - name: POSTGRES_URL
-          value: {{ .Values.backend.postgres_url }}}
+          value: {{ .Values.backend.postgres_url | quote }}
         {{- range $key, $value := .Values.backend.env }}
         - name: {{ $key }}
           value: {{ $value | quote }}
