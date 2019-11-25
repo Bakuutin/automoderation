@@ -197,7 +197,6 @@ func setNewTrackID(secure *securecookie.SecureCookie, db *pgx.Conn, w http.Respo
 			Value: encoded,
 			Path:  "/",
 			Secure:   true,
-			Secure:   false,
 			HttpOnly: true,
 			Expires:  time.Now().AddDate(2, 0, 2),
 		}
