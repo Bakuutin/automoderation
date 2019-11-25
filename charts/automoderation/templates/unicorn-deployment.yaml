@@ -48,7 +48,7 @@ spec:
         image: "{{ .Values.image.repository }}-backend:{{ .Values.image.tag }}"
         env:
         - name: REDIS_URL
-          value: {{ .Release.Name }}-redis-master
+          value: "{{ .Release.Name }}-redis-master:6379"
         - name: REDIS_DB
           value: '0'
         - name: REDIS_PASSWORD
