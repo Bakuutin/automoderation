@@ -12,6 +12,8 @@ import { createBrowserHistory } from 'history';
 import { Route, Switch, Redirect } from 'react-router-dom'
 import Room from './components/Room'
 import { RoomShare } from './components/Share'
+import PrivacyPolicy from './components/legal/PrivacyPolicy'
+import TermsAndConditions from './components/legal/TermsAndConditions'
 import { ConnectedRouter } from 'connected-react-router'
 
 const getRandomName = () => {
@@ -36,10 +38,16 @@ const store = configureStore({}, history);
 
 ReactDOM.render(
     <Provider store={store}>
-        <ConnectedRouter history={history}>
+        <ConnectedRouter onUpdate={() => window.scrollTo(0, 0)} history={history}>
             <Switch>
                 <Route exact path='/'>
                     <Redirect to={`/${getRandomName()}`}/>
+                </Route>
+                <Route exact path='/privacy_policy'>
+                    <PrivacyPolicy/>
+                </Route>
+                <Route exact path='/terms_and_conditions'>
+                    <TermsAndConditions/>
                 </Route>
                 <Route path="/:room">
                     <Route path="/:room/share" render={props => <RoomShare name={props.match.params['room']}/>}/>
