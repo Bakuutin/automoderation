@@ -38,7 +38,7 @@ const store = configureStore({}, history);
 
 ReactDOM.render(
     <Provider store={store}>
-        <ConnectedRouter onUpdate={() => window.scrollTo(0, 0)} history={history}>
+        <ConnectedRouter history={history}>
             <Switch>
                 <Route exact path='/'>
                     <Redirect to={`/${getRandomName()}`}/>
