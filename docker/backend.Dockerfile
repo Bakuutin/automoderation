@@ -1,4 +1,4 @@
-FROM golang
+FROM golang:1.15 as base
 
 RUN go get github.com/pilu/fresh
 COPY ./backend /go/src/automoderation

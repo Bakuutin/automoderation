@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:10 as base
 
 WORKDIR /usr/local/app
 COPY ./frontend/package.json /usr/local/app/package.json

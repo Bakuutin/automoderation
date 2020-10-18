@@ -10,33 +10,34 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/felixge/httpsnoop"
 )
 
+const acceptEncoding string = "Accept-Encoding"
+
 type compressResponseWriter struct {
-	io.Writer
-	http.ResponseWriter
-	http.Hijacker
-	http.Flusher
-	http.CloseNotifier
+	compressor io.Writer
+	w          http.ResponseWriter
 }
 
-func (w *compressResponseWriter) WriteHeader(c int) {
-	w.ResponseWriter.Header().Del("Content-Length")
-	w.ResponseWriter.WriteHeader(c)
+func (cw *compressResponseWriter) WriteHeader(c int) {
+	cw.w.Header().Del("Content-Length")
+	cw.w.WriteHeader(c)
 }
 
-func (w *compressResponseWriter) Header() http.Header {
-	return w.ResponseWriter.Header()
-}
-
-func (w *compressResponseWriter) Write(b []byte) (int, error) {
-	h := w.ResponseWriter.Header()
+func (cw *compressResponseWriter) Write(b []byte) (int, error) {
+	h := cw.w.Header()
 	if h.Get("Content-Type") == "" {
 		h.Set("Content-Type", http.DetectContentType(b))
 	}
 	h.Del("Content-Length")
 
-	return w.Writer.Write(b)
+	return cw.compressor.Write(b)
+}
+
+func (cw *compressResponseWriter) ReadFrom(r io.Reader) (int64, error) {
+	return io.Copy(cw.compressor, r)
 }
 
 type flusher interface {
@@ -45,12 +46,12 @@ type flusher interface {
 
 func (w *compressResponseWriter) Flush() {
 	// Flush compressed data if compressor supports it.
-	if f, ok := w.Writer.(flusher); ok {
+	if f, ok := w.compressor.(flusher); ok {
 		f.Flush()
 	}
 	// Flush HTTP response.
-	if w.Flusher != nil {
-		w.Flusher.Flush()
+	if f, ok := w.w.(http.Flusher); ok {
+		f.Flush()
 	}
 }
 
@@ -82,7 +83,7 @@ func CompressHandlerLevel(h http.Handler, level int) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// detect what encoding to use
 		var encoding string
-		for _, curEnc := range strings.Split(r.Header.Get("Accept-Encoding"), ",") {
+		for _, curEnc := range strings.Split(r.Header.Get(acceptEncoding), ",") {
 			curEnc = strings.TrimSpace(curEnc)
 			if curEnc == gzipEncoding || curEnc == flateEncoding {
 				encoding = curEnc
@@ -90,9 +91,17 @@ func CompressHandlerLevel(h http.Handler, level int) http.Handler {
 			}
 		}
 
+		// always add Accept-Encoding to Vary to prevent intermediate caches corruption
+		w.Header().Add("Vary", acceptEncoding)
+
 		// if we weren't able to identify an encoding we're familiar with, pass on the
 		// request to the handler and return
 		if encoding == "" {
+			h.ServeHTTP(w, r)
+			return
+		}
+
+		if r.Header.Get("Upgrade") != "" {
 			h.ServeHTTP(w, r)
 			return
 		}
@@ -107,31 +116,27 @@ func CompressHandlerLevel(h http.Handler, level int) http.Handler {
 		defer encWriter.Close()
 
 		w.Header().Set("Content-Encoding", encoding)
-		r.Header.Del("Accept-Encoding")
-		w.Header().Add("Vary", "Accept-Encoding")
+		r.Header.Del(acceptEncoding)
 
-		hijacker, ok := w.(http.Hijacker)
-		if !ok { /* w is not Hijacker... oh well... */
-			hijacker = nil
+		cw := &compressResponseWriter{
+			w:          w,
+			compressor: encWriter,
 		}
 
-		flusher, ok := w.(http.Flusher)
-		if !ok {
-			flusher = nil
-		}
-
-		closeNotifier, ok := w.(http.CloseNotifier)
-		if !ok {
-			closeNotifier = nil
-		}
-
-		w = &compressResponseWriter{
-			Writer:         encWriter,
-			ResponseWriter: w,
-			Hijacker:       hijacker,
-			Flusher:        flusher,
-			CloseNotifier:  closeNotifier,
-		}
+		w = httpsnoop.Wrap(w, httpsnoop.Hooks{
+			Write: func(httpsnoop.WriteFunc) httpsnoop.WriteFunc {
+				return cw.Write
+			},
+			WriteHeader: func(httpsnoop.WriteHeaderFunc) httpsnoop.WriteHeaderFunc {
+				return cw.WriteHeader
+			},
+			Flush: func(httpsnoop.FlushFunc) httpsnoop.FlushFunc {
+				return cw.Flush
+			},
+			ReadFrom: func(rff httpsnoop.ReadFromFunc) httpsnoop.ReadFromFunc {
+				return cw.ReadFrom
+			},
+		})
 
 		h.ServeHTTP(w, r)
 	})
