@@ -1,14 +1,47 @@
 version: '2.1'
 services:
   frontend:
-    extends:
-      file: ./docker/services.yml
-      service: frontend-${MODE:-dev}
+    build:
+      dockerfile: ./docker/frontend.Dockerfile
+      context: .
+      target: base
+    restart: unless-stopped
+    environment:
+      NODE_ENV: debug
+      GOOGLE_ANALYTICS_ID: "${GOOGLE_ANALYTICS_ID}"
+    volumes:
+      - static:/usr/local/app/dist
+      - ./frontend/src:/usr/local/app/src
+      - ./frontend/webpack.config.js:/usr/local/app/webpack.config.js:ro
+      - ./frontend/package.json:/usr/local/app/package.json:ro
+    command: ['npm', 'run', 'watch']
   backend:
-    extends:
-      file: ./docker/services.yml
-      service: backend-${MODE:-dev}
+    build:
+      dockerfile: ./docker/backend.Dockerfile
+      context: .
+      target: base
+    volumes:
+      - static:/data/static/
+      - ./backend:/go/src/automoderation
     ports:
       - "${PORT:-8080}:80"
+    environment:
+      POSTGRES_URL: postgres://postgres@postgres:5432/postgres?sslmode=disable
+      REDIS_PASSWORD: ""
+      REDIS_URL: "redis:6379"
+      REDIS_DB: 0
+    command: ["fresh"]
+  migrate:
+    volumes:
+      - ./backend/migrations:/migrations
+    environment:
+      POSTGRES_URL: postgres://postgres@postgres:5432/postgres?sslmode=disable
+    image: migrate/migrate:v4.7.0
+    entrypoint: []
+    command: ['sleep', '9223372036854775807']
+  postgres:
+    image: postgres:9.6-alpine
+  redis:
+    image: redis
 volumes:
   static:

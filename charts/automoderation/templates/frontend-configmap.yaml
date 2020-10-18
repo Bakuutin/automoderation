@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "automoderation.fullname" . }}-extra-html
+  labels:
+    {{ include "base_labels" . | indent 4 }}
+data:
+  extra_head.html: {{ .Values.frontend.extra_head | quote }}
+  extra_body.html: {{ .Values.frontend.extra_body | quote }}

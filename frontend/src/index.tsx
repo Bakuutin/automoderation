@@ -1,15 +1,60 @@
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
 import { Provider } from 'react-redux';
-import { compose, createStore } from 'redux';
 
-import reducer from './reducers';
-import { Root } from './components/Root';
+import * as randomstring from 'randomstring'
 
-// const enhancer = compose(
-//     persistState(['auth']),
-// );
+import ReactGA from 'react-ga';
 
-let store = createStore(reducer);
+import configureStore from './configureStore'
+import { createBrowserHistory } from 'history';
 
-ReactDOM.render(<Provider store={store}><Root/></Provider>, document.getElementById('root'));
+import { Route, Switch, Redirect } from 'react-router-dom'
+import Room from './components/Room'
+import { RoomShare } from './components/Share'
+import PrivacyPolicy from './components/legal/PrivacyPolicy'
+import TermsAndConditions from './components/legal/TermsAndConditions'
+import { ConnectedRouter } from 'connected-react-router'
+
+const getRandomName = () => {
+    return randomstring.generate({
+        length: 10,
+        charset: 'alphanumeric',
+        readable: false,
+    })
+}
+
+const history = createBrowserHistory()
+
+const debug = process.env.NODE_ENV === 'development';
+
+ReactGA.initialize(process.env.GOOGLE_ANALYTICS_ID, {
+    debug: debug,
+    gaAddress: process.env.GOOGLE_ANALYTICS_URL,
+    testMode: debug,
+});
+
+const store = configureStore({}, history);
+
+ReactDOM.render(
+    <Provider store={store}>
+        <ConnectedRouter history={history}>
+            <Switch>
+                <Route exact path='/'>
+                    <Redirect to={`/${getRandomName()}`}/>
+                </Route>
+                <Route exact path='/privacy_policy'>
+                    <PrivacyPolicy/>
+                </Route>
+                <Route exact path='/terms_and_conditions'>
+                    <TermsAndConditions/>
+                </Route>
+                <Route path="/:room">
+                    <Route path="/:room/share" render={props => <RoomShare name={props.match.params['room']}/>}/>
+                    <Route exact path="/:room" render={props => <Room name={props.match.params['room']}/>}/>
+                </Route>
+            </Switch>
+        </ConnectedRouter>
+    </Provider>,
+    document.getElementById('root'),
+);

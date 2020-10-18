@@ -3,10 +3,21 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "zzQB4HPb8VA17PWMgcbE3NJDLDI=",
+			"path": "github.com/bsm/redislock",
+			"revision": "b80b08c8989703908279cfb50782179de7fdd5f0",
+			"revisionTime": "2019-09-16T10:03:32Z"
+		},
+		{
+			"checksumSHA1": "jp5198WE/MAApyeur0g49JY24j4=",
 			"path": "github.com/certifi/gocertifi",
-			"revision": "a5e0173ced670013bfb649c7e806bc9529c986ec",
-			"revisionTime": "2019-09-05T05:32:35Z"
+			"revision": "2c3bb06c6054e133430498817d26ac003d08f020",
+			"revisionTime": "2020-09-22T22:05:41Z"
+		},
+		{
+			"checksumSHA1": "6DCky9rAlTKzxR6XayPDSL0/02E=",
+			"path": "github.com/felixge/httpsnoop",
+			"revision": "80c3c2123b72a19bf86e424759ce61a51b0f5f1b",
+			"revisionTime": "2020-09-19T15:28:40Z"
 		},
 		{
 			"checksumSHA1": "DDb/mPtFh1OfbUXdXMaLxio0g48=",
@@ -15,34 +26,66 @@
 			"revisionTime": "2019-06-19T09:25:23Z"
 		},
 		{
-			"checksumSHA1": "wBIyoLIKD2LpgXnG50buI4+lPao=",
+			"path": "github.com/go-redis/redis",
+			"revision": "dab9d3f80286dfc493442e6f0b1c7809873ca602",
+			"revisionTime": "2019-11-19T10:37:26Z"
+		},
+		{
+			"path": "github.com/go-redis/redis/v7/internal",
+			"revision": ""
+		},
+		{
+			"path": "github.com/go-redis/redis/v7/internal/consistenthash",
+			"revision": ""
+		},
+		{
+			"path": "github.com/go-redis/redis/v7/internal/hashtag",
+			"revision": ""
+		},
+		{
+			"path": "github.com/go-redis/redis/v7/internal/pool",
+			"revision": ""
+		},
+		{
+			"path": "github.com/go-redis/redis/v7/internal/proto",
+			"revision": ""
+		},
+		{
+			"path": "github.com/go-redis/redis/v7/internal/util",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "r21png+dOpKHByUJzEFbLIeI/W4=",
 			"path": "github.com/gorilla/handlers",
-			"revision": "8a3748addc242fc560bd6d4ff28b0374c010b1b4",
-			"revisionTime": "2019-07-23T03:58:38Z"
+			"revision": "3e030244b4ba0480763356fc8ca0ade6222e2da0",
+			"revisionTime": "2020-09-12T19:21:07Z"
 		},
 		{
-			"checksumSHA1": "Ly2DPGZEU/9uJgLXtlqbJ0rZUAA=",
+			"checksumSHA1": "NzAsiqj9T9L+Wy96ZSPHot9/LOo=",
 			"path": "github.com/gorilla/mux",
-			"revision": "884b5ffcbd3a11b730f0b75f5c86ac408753c34d",
-			"revisionTime": "2019-08-30T12:11:56Z"
+			"revision": "d07530f46e1eec4e40346e24af34dcc6750ad39f",
+			"revisionTime": "2020-09-12T19:20:56Z"
 		},
 		{
-			"checksumSHA1": "ajAqUByI39Sfm99F/ZNOguPP3Mk=",
+			"checksumSHA1": "mo95lsTo6uV/Yw9IhdwEA2mKJHI=",
+			"path": "github.com/gorilla/securecookie",
+			"revision": "f37875ef1fb538320ab97fc6c9927d94c280ed5b",
+			"revisionTime": "2020-09-12T19:29:11Z"
+		},
+		{
+			"checksumSHA1": "oes/4q+rUpbUusHiEzfCd9WpUUg=",
 			"path": "github.com/gorilla/websocket",
-			"revision": "c3e18be99d19e6b3e8f1559eea2c161a665c4b6b",
-			"revisionTime": "2019-08-25T01:20:11Z"
+			"revision": "c3dd95aea9779669bb3daafbd84ee0530c8ce1c1",
+			"revisionTime": "2020-09-12T19:32:13Z"
 		},
 		{
-			"checksumSHA1": "Tutue3nEgM/87jitUcYv6ODwyNE=",
+			"path": "github.com/jackc/pgx/v4",
+			"revision": ""
+		},
+		{
 			"path": "github.com/satori/go.uuid",
 			"revision": "b2ce2384e17bbe0c6d34077efa39dbab3e09123b",
 			"revisionTime": "2018-10-28T12:50:25Z"
-		},
-		{
-			"checksumSHA1": "Wvw+ntCbOiAtP3l5F37/lzOL1bE=",
-			"path": "github.com/thanhpk/randstr",
-			"revision": "6e89fe966579c5905054d46d61cf1621ef291e2c",
-			"revisionTime": "2019-05-09T17:48:16Z"
 		}
 	],
 	"rootPath": "automoderation/backend"

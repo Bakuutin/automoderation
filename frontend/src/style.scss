@@ -12,14 +12,13 @@ $primary-color: $primary;
 
 
 body {
-    padding-top: 40px;
-    padding-bottom: 250px;
+    overflow-x: hidden;
 }
 
 .form-signin {
     max-width: 330px;
     padding: 15px;
-    margin: 0 auto;
+    margin: 40px auto;
 
     h3 {
         margin-bottom: 10px;
@@ -85,7 +84,6 @@ $topic-bg: $red;
     @include button-variant($topic-bg, $topic-bg);
     color: $white;
 }
-
 
 .alert-meta {
     @include alert-variant($meta-bg, $meta-bg, $white);

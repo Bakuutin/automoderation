@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux'
+import { connectRouter, RouterState } from 'connected-react-router'
 import { sortBy, uniqBy, concat, filter } from 'lodash'
 import {
   SET_USER_NAME,
@@ -7,6 +8,7 @@ import {
   HAND_DELETED,
 } from './actionTypes'
 import { HandData } from './components/Hand'
+import { History } from 'history'
 
 type AuthState = {
   userName: string,
@@ -18,6 +20,7 @@ type HandState = HandData[];
 export type RootState = {
   auth: AuthState,
   hands: HandState,
+  router: RouterState,
 }
 
 const auth = (state: AuthState = {userName: ''}, action) => {
@@ -49,6 +52,10 @@ const hands = (state: HandState = [], action: {hand?: HandData, type?: string } 
 }
 
 
-const reducer = combineReducers({auth, hands})
+const createRootReducer = (history: History) => combineReducers({
+  router: connectRouter(history),
+  auth,
+  hands,
+})
 
-export default reducer
+export default createRootReducer

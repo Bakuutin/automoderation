@@ -2,14 +2,15 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"time"
 
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 // Hand represents the data broadcasted to users
 type Hand struct {
-	User     *User     `json:"user"`
+	UserName string    `json:"user"`
 	Priority uint8     `json:"priority"`
 	ID       uuid.UUID `json:"id"`
 	Cancel   bool      `json:"cancel,omitempty"`
@@ -22,12 +23,24 @@ func (hand *Hand) Bytes() []byte {
 	return bytes
 }
 
-// NewHand creates a hand
-func NewHand(user *User, priority uint8) *Hand {
+func getHandFromRow(values []interface{}) *Hand {
+	priority := uint8(values[1].(int16))
+	userName := values[0].(string)
+	idBytes := values[2].([16]uint8)
+	id := uuid.FromBytesOrNil(idBytes[:])
+	raisedAt := values[3].(time.Time)
+
 	return &Hand{
+		UserName: userName,
 		Priority: priority,
-		User:     user,
-		ID:       uuid.Must(uuid.NewV4()),
-		RaisedAt: time.Now().Unix(),
+		ID:       id,
+		RaisedAt: raisedAt.UTC().UnixNano(),
+	}
+}
+
+func broadcastHand(p *requestParams, h *Hand) {
+	err := p.RDB.Publish(p.ChannelName(), h.Bytes()).Err()
+	if err != nil {
+		log.Panicln(err)
 	}
 }

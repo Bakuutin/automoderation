@@ -1,19 +1,30 @@
-const nameMap = [
-    'Meta',
-    'Clarifying question',
-    'Expand',
-    'Follow-up question',
-    'Change topic',
-];
+export const priorities: {
+    name: string;
+    style: string;
+    hide?: boolean;
+}[] = [
+    {
+        name: 'Meta',
+        style: 'meta',
+    },
+    {
+        name: 'Clarifying question',
+        style: 'clarifying',
+    },
+    {
+        name: 'Expand',
+        style: 'expand',
+    },
+    {
+        name: 'Follow-up question',
+        style: 'probing',
+        hide: true,
+    },
+    {
+        name: 'Change topic',
+        style: 'topic',
+    },
+]
 
-const styleMap = [
-    'meta',
-    'clarifying',
-    'expand',
-    'probing',
-    'topic',
-];
-
-
-export const getPriorityName = (priority: number) => (nameMap[priority]);
-export const getPriorityStyle = (priority: number) => (styleMap[priority]);
+export const getPriorityName = (priority: number) => (priorities[priority].name);
+export const getPriorityStyle = (priority: number) => (priorities[priority].style);
