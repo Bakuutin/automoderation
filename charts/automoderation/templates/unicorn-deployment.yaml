@@ -72,14 +72,14 @@ spec:
           mountPath: /data/static/
         livenessProbe:
           httpGet:
-            path: /
+            path: /health
             port: 80
-          initialDelaySeconds: 20
+          initialDelaySeconds: 5
         readinessProbe:
           httpGet:
-            path: /
+            path: /health
             port: 80
-          initialDelaySeconds: 20
+          initialDelaySeconds: 5
       volumes:
       - name: front-data
         emptyDir: {}

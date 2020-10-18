@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3.4'
 services:
   frontend:
     build:
@@ -8,13 +8,12 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: debug
-      GOOGLE_ANALYTICS_ID: "${GOOGLE_ANALYTICS_ID}"
+      GOOGLE_ANALYTICS_ID: "${GOOGLE_ANALYTICS_ID:-''}"
     volumes:
       - static:/usr/local/app/dist
       - ./frontend/src:/usr/local/app/src
       - ./frontend/webpack.config.js:/usr/local/app/webpack.config.js:ro
       - ./frontend/package.json:/usr/local/app/package.json:ro
-    command: ['npm', 'run', 'watch']
   backend:
     build:
       dockerfile: ./docker/backend.Dockerfile
@@ -30,15 +29,17 @@ services:
       REDIS_PASSWORD: ""
       REDIS_URL: "redis:6379"
       REDIS_DB: 0
-    command: ["fresh"]
   migrate:
     volumes:
       - ./backend/migrations:/migrations
-    environment:
-      POSTGRES_URL: postgres://postgres@postgres:5432/postgres?sslmode=disable
     image: migrate/migrate:v4.7.0
     entrypoint: []
-    command: ['sleep', '9223372036854775807']
+    command: [
+      './migrate',
+      '-path', '/migrations/',
+      '-database', 'postgres://postgres@postgres:5432/postgres?sslmode=disable',
+      'up',
+    ]
   postgres:
     image: postgres:9.6-alpine
   redis:
