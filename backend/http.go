@@ -37,7 +37,7 @@ type ErrorResponse struct {
 
 type handlerFunc func(*requestParams, http.ResponseWriter, *http.Request)
 
-func getRequestWrapper(
+func getHandRequestWrapper(
 	rdb *redis.Client,
 	db *pgx.Conn,
 	locker *redislock.Client,
@@ -82,6 +82,31 @@ func getRequestWrapper(
 
 			f(params, w, r)
 		}
+	}
+}
+
+
+func healthCheck(
+	db *pgx.Conn,
+	rdb *redis.Client,
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, err := db.Exec(
+			context.Background(),
+			`SELECT 1`,
+		)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		if rdb.Ping().Err() != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.Write([]byte("OK"))
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
@@ -227,12 +252,14 @@ func main() {
 	rdb := getRedis()
 	defer rdb.Close()
 
-	wrap := getRequestWrapper(
+	wrap := getHandRequestWrapper(
 		rdb,
 		db,
 		redislock.New(rdb),
 		getSecure(),
 	)
+
+
 
 	r := mux.NewRouter().StrictSlash(true)
 	user := r.PathPrefix(`/api/rooms/{roomID}/users/{userName}`).Subrouter()
@@ -241,6 +268,7 @@ func main() {
 	hands.HandleFunc(`/`, wrap(raiseHand)).Methods("POST")
 	hands.HandleFunc(`/{handID:[\-a-z0-9]{36}}`, wrap(dropHand)).Methods("DELETE")
 
+	r.HandleFunc(`/health`, healthCheck(db, rdb)).Methods("GET")
 	r.PathPrefix(`/static/`).Handler(http.StripPrefix(`/static/`, http.FileServer(http.Dir(`/data/static`))))
 	r.PathPrefix(`/`).HandlerFunc(serveIndex).Methods("GET")
 
