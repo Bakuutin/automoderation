@@ -10,22 +10,10 @@ backend:
   postgres_url: ""
 
 redis:
-  password: "pZ8OR5I53U0nE4j25vkvGgSODgZdvDQ5"
+  password: ""
 
 frontend:
-  env:
-    GOOGLE_ANALYTICS_ID: 'UA-117518533-1'
-    GOOGLE_ANALYTICS_URL: 'https://aproxy.y.friendzone.bot/analytics.js'
+  env: []
   secrets: []
-  extra_head: |
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-5Q7VHPF');</script>
-    <!-- End Google Tag Manager -->
-  extra_body: |
-    <!-- Google Tag Manager -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5Q7VHPF" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager -->
+  extra_head: ''
+  extra_body: ''
