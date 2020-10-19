@@ -59,6 +59,6 @@ migrate:
   - master
 
 variables:
-  BACKEND_IMAGE: docker-registry.friendzone.bot/main/automoderation-backend
-  FRONTEND_IMAGE: docker-registry.friendzone.bot/main/automoderation-frontend
+  BACKEND_IMAGE: docker-registry.friendzone.bot/main/automoderation/backend
+  FRONTEND_IMAGE: docker-registry.friendzone.bot/main/automoderation/frontend
   DOCKER_DRIVER: overlay2
