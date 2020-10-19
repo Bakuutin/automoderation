@@ -11,7 +11,6 @@ import { setUserName, handReceieved, resetHands } from '../actions'
 import SigninForm from './SigninForm'
 import Hand, { HandData } from './Hand'
 import Footer from './Footer'
-import { AssertionError } from 'assert';
 import { Link } from 'react-router-dom';
 
 export interface Props {
@@ -104,9 +103,6 @@ class dRoom extends React.Component<Props, State> {
     }
 
     get path() {
-        if (!this.props.userName) {
-            throw new AssertionError({message: 'Missing username'})
-        }
         return `/api/rooms/${encodeURIComponent(this.props.name)}/users/${encodeURIComponent(this.props.userName)}`
     }
 

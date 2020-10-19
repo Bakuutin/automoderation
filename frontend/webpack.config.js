@@ -11,7 +11,7 @@ let extraHead = '',
 if (process.env.EXTRA_HEAD) extraHead = fs.readFileSync(process.env.EXTRA_HEAD, 'utf8');
 if (process.env.EXTRA_BODY) extraBody = fs.readFileSync(process.env.EXTRA_BODY, 'utf8');
 
-const config = {
+module.exports = {
     entry: {
         style: './src/style.scss',
         fontawesome: '@fortawesome/fontawesome-free/js/all.js',
@@ -36,10 +36,21 @@ const config = {
             filename: '[name].[hash].css',
             chunkFilename: '[id].[hash].css',
         }),
-        new CopyPlugin(['public']),
+        new CopyPlugin({
+            patterns: [
+                {
+                    from: "public",
+                },
+            ],
+        }),
     ],
     resolve: {
         extensions: ['*', '.js', '.jsx', '.scss', '.ts', '.tsx'],
+        fallback: {
+            crypto: require.resolve('crypto-browserify'),
+            buffer: false,
+            stream: false,
+        }
     },
     module: {
         rules: [
@@ -52,11 +63,11 @@ const config = {
                 enforce: 'pre',
                 test: /\.(js|jsx)$/i,
                 exclude: /node_modules/,
-                loaders: ['babel-loader'],
+                use: ['babel-loaderclaer'],
             },
             {
                 test: /\.scss$/i,
-                loader: [
+                use: [
                     isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
                     'css-loader',
                     {
@@ -94,5 +105,3 @@ const config = {
         ]
     }
 };
-
-module.exports = config;
