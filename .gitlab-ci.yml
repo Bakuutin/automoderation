@@ -6,7 +6,7 @@ build-front:
     - dockerd --host=unix:///var/run/docker.sock > /usr/local/bin/nohup.out 2>&1 &
     - sleep 5
     - docker pull $FRONTEND_IMAGE:internal-latest || true
-    - docker build --cache-from $FRONTEND_IMAGE:latest --tag $FRONTEND_IMAGE:$CI_COMMIT_SHA --tag $FRONTEND_IMAGE:latest --target base  -f ./docker/frontend.Dockerfile .
+    - docker build --cache-from $FRONTEND_IMAGE:internal-latest --tag $FRONTEND_IMAGE:$CI_COMMIT_SHA --tag $FRONTEND_IMAGE:internal-latest --target base  -f ./docker/frontend.Dockerfile .
     - docker push $FRONTEND_IMAGE:internal-latest
     - docker push $FRONTEND_IMAGE:internal-$CI_COMMIT_SHA
     - docker pull $FRONTEND_IMAGE:latest || true
@@ -22,7 +22,7 @@ build-back:
     - dockerd --host=unix:///var/run/docker.sock > /usr/local/bin/nohup.out 2>&1 &
     - sleep 5
     - docker pull $BACKEND_IMAGE:internal-latest || true
-    - docker build --cache-from $BACKEND_IMAGE:latest --tag $BACKEND_IMAGE:$CI_COMMIT_SHA --tag $BACKEND_IMAGE:latest --target base  -f ./docker/backend.Dockerfile .
+    - docker build --cache-from $BACKEND_IMAGE:internal-latest --tag $BACKEND_IMAGE:$CI_COMMIT_SHA --tag $BACKEND_IMAGE:internal-latest --target base  -f ./docker/backend.Dockerfile .
     - docker push $BACKEND_IMAGE:internal-latest
     - docker push $BACKEND_IMAGE:internal-$CI_COMMIT_SHA
     - docker pull $BACKEND_IMAGE:latest || true
