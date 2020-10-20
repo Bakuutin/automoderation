@@ -41,7 +41,7 @@ deploy:
     - kubectl config set-cluster "$CI_PROJECT_ID" --server="$KUBE_URL" --certificate-authority="$KUBE_CA_PEM_FILE"
     - kubectl config set-credentials "$CI_PROJECT_ID" --token="$KUBE_TOKEN"
     - kubectl config set-context "$CI_PROJECT_ID" --cluster="$CI_PROJECT_ID" --user="$CI_PROJECT_ID" --namespace="$KUBE_NAMESPACE"
-    - kubectl config use-context --user="$CI_PROJECT_ID"
+    - kubectl config use-context "$CI_PROJECT_ID"
     - base64 -d $HELM_VALUES > /tmp/values.yaml
     - helm upgrade --install automoderation -f /tmp/values.yaml --namespace default --atomic --set image.tag=${CI_COMMIT_SHA} charts/automoderation
   environment:
