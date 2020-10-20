@@ -17,7 +17,7 @@ spec:
     spec:
       initContainers:
       - name: frontend
-        image: "{{ .Values.image.repository }}-frontend:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}/frontend:{{ .Values.image.tag }}"
         volumeMounts:
         - name: front-data
           mountPath: /usr/local/app/dist
@@ -40,7 +40,7 @@ spec:
         {{- end }}
       containers:
       - name: backend
-        image: "{{ .Values.image.repository }}-backend:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}/backend:{{ .Values.image.tag }}"
         env:
         - name: REDIS_URL
           value: "{{ .Release.Name }}-redis-master:6379"
