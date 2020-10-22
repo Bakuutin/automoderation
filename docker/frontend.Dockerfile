@@ -11,4 +11,4 @@ CMD ["npm", "run", "watch"]
 
 FROM alpine
 COPY --from=base /usr/local/app/dist /static
-CMD ["mv", "/static/*", "/usr/local/app/dist/"]
+CMD ["sh", "-c", "rm -rf /usr/local/app/dist/* && mv /static/* /usr/local/app/dist/"]
