@@ -11,5 +11,4 @@ CMD ["npm", "run", "watch"]
 
 FROM alpine
 COPY --from=base /usr/local/app/dist /static
-RUN mkdir -p /usr/local/app/dist
-CMD ["mv", "/usr/local/app/dist/*", "/static/"]
+CMD ["mv", "/static/*", "/usr/local/app/dist/"]
