@@ -7,7 +7,7 @@ EXPOSE 80
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags '-w -s' -o /backend
 CMD ["fresh"]
 
-FROM scratch
+FROM alpine
 COPY --from=base /backend /backend
 ENTRYPOINT ["/backend"]
 EXPOSE 80

@@ -21,8 +21,12 @@ module.exports = {
     plugins: [
         new webpack.EnvironmentPlugin({
             NODE_ENV: 'production',
+            NODE_DEBUG: !isDevelopment,
             GOOGLE_ANALYTICS_ID: '',
             GOOGLE_ANALYTICS_URL: 'https://www.google-analytics.com/analytics_debug.js',
+        }),
+        new webpack.DefinePlugin({
+            'process.browser': true,
         }),
         new HtmlWebpackPlugin({
             hash: true,
@@ -33,8 +37,8 @@ module.exports = {
             extraBody: extraBody,
         }),
         new MiniCssExtractPlugin({
-            filename: '[name].[hash].css',
-            chunkFilename: '[id].[hash].css',
+            filename: '[name].[contenthash].css',
+            chunkFilename: '[id].[contenthash].css',
         }),
         new CopyPlugin({
             patterns: [
@@ -48,8 +52,10 @@ module.exports = {
         extensions: ['*', '.js', '.jsx', '.scss', '.ts', '.tsx'],
         fallback: {
             crypto: require.resolve('crypto-browserify'),
-            buffer: false,
-            stream: false,
+            buffer: require.resolve('buffer'),
+            stream: require.resolve('stream-browserify'),
+            assert: require.resolve('assert/'),
+            process: require.resolve('assert/'),
         }
     },
     module: {

@@ -241,7 +241,7 @@ func setNewTrackID(secure *securecookie.SecureCookie, db *pgx.Conn, w http.Respo
 }
 
 func serveIndex(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(200) // Freeze header. Allows to set cookie
+	// w.WriteHeader(200) // Freeze header. Allows to set cookie
 	http.ServeFile(w, r, "/data/static/index.html")
 }
 

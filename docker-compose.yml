@@ -4,8 +4,7 @@ services:
     build:
       dockerfile: ./docker/frontend.Dockerfile
       context: .
-      target: base
-    restart: unless-stopped
+      # target: base
     environment:
       NODE_ENV: debug
       GOOGLE_ANALYTICS_ID: "${GOOGLE_ANALYTICS_ID:-''}"
@@ -18,7 +17,7 @@ services:
     build:
       dockerfile: ./docker/backend.Dockerfile
       context: .
-      target: base
+      # target: base
     volumes:
       - static:/data/static/
       - ./backend:/go/src/automoderation

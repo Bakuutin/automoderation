@@ -1,14 +1,11 @@
-@import "bootswatch/dist/litera/variables";
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+
 $font-family-sans-serif: 'Roboto', sans-serif;
 
-@import "bootstrap/scss/bootstrap";
-@import "bootswatch/dist/litera/bootswatch";
+@import '~bootstrap/scss/bootstrap';
 
-// $fa-font-path: "/static/fonts/font-awesome";
-// @import "@fortawesome/fontawesome-free/scss/fontawesome";
-
-$primary-color: $primary;
-@import "loaders.css/src/animations/ball-pulse-rise";
+@import "~loaders.css/src/animations/ball-pulse-rise";
 
 
 body {
