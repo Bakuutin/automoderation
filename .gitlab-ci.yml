@@ -1,5 +1,5 @@
 build-front:
-  image: docker:dind
+  image: docker:19-dind
   stage: build
   script:
     - cd $CI_PROJECT_DIR
@@ -15,7 +15,7 @@ build-front:
     - docker push $FRONTEND_IMAGE:latest
 
 build-back:
-  image: docker:dind
+  image: docker:19-dind
   stage: build
   script:
     - cd $CI_PROJECT_DIR
