@@ -1,18 +1,28 @@
 build-front:
-  image: docker:19-dind
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
   stage: build
+  retry:
+    max: 1
+    when: runner_system_failure
   script:
-    - cd $CI_PROJECT_DIR
-    - dockerd --host=unix:///var/run/docker.sock > /usr/local/bin/nohup.out 2>&1 &
-    - sleep 5
-    - docker pull $FRONTEND_IMAGE:internal-latest || true
-    - docker build --cache-from $FRONTEND_IMAGE:internal-latest --tag $FRONTEND_IMAGE:internal-$CI_COMMIT_SHA --tag $FRONTEND_IMAGE:internal-latest --target base  -f ./docker/frontend.Dockerfile .
-    - docker push $FRONTEND_IMAGE:internal-latest
-    - docker push $FRONTEND_IMAGE:internal-$CI_COMMIT_SHA
-    - docker pull $FRONTEND_IMAGE:latest || true
-    - docker build --cache-from $FRONTEND_IMAGE:internal-latest --cache-from $FRONTEND_IMAGE:latest --tag $FRONTEND_IMAGE:$CI_COMMIT_SHA --tag $FRONTEND_IMAGE:latest -f ./docker/frontend.Dockerfile .
-    - docker push $FRONTEND_IMAGE:$CI_COMMIT_SHA
-    - docker push $FRONTEND_IMAGE:latest
+    - mkdir -p /kaniko/.docker
+    - KANIKOCFG="{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64 | tr -d '\n')\"}}}}"
+    - echo "${KANIKOCFG}" > /kaniko/.docker/config.json
+    - >-
+      /kaniko/executor
+      --cache=true
+      --context $CI_PROJECT_DIR
+      --dockerfile $CI_PROJECT_DIR/docker/frontend.Dockerfile
+      --destination $FRONTEND_IMAGE:internal-$CI_COMMIT_SHA
+      --target base
+    - >-
+      /kaniko/executor
+      --cache=true
+      --context $CI_PROJECT_DIR
+      --dockerfile $CI_PROJECT_DIR/docker/frontend.Dockerfile
+      --destination $FRONTEND_IMAGE:$CI_COMMIT_SHA
 
 build-back:
   image: docker:19-dind
