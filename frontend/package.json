@@ -59,11 +59,11 @@
     "@types/react-router": "^5.1.8",
     "@types/react-router-dom": "^5.1.6",
     "@types/reactstrap": "^8.5.2",
-    "babel-loader": "^8.1.0",
+    "babel-loader": "^8.3.0",
     "copy-webpack-plugin": "^6.2.1",
-    "html-webpack-plugin": "^4.5.0",
+    "html-webpack-plugin": "^5.5.0",
     "source-map-loader": "^1.1.1",
-    "ts-loader": "^8.0.6",
+    "ts-loader": "^8.4.0",
     "typescript": "^4.0.3",
     "webpack-cli": "^4.1.0"
   }
